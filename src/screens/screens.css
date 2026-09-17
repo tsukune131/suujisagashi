@@ -1,0 +1,49 @@
+.screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.screen h1 {
+  font-size: 28px;
+  margin: 0;
+}
+
+.number-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.number-button {
+  min-width: 88px;
+  min-height: 88px;
+  border-radius: 20px;
+  border: none;
+  font-size: 32px;
+  font-weight: bold;
+  background: #ffe680;
+  color: #4a3b00;
+  touch-action: manipulation;
+}
+
+.screen-action-button {
+  min-width: 88px;
+  min-height: 88px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  background: #a0e6c8;
+  color: #06402b;
+  touch-action: manipulation;
+}

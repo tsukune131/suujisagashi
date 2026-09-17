@@ -91,4 +91,12 @@ Web/PWAのまま、毎日使って気持ちいいレベルまで磨く。
   `npx cap add ios`でiOSプロジェクトを生成。共有スキーム(App.xcscheme)を追加、
   Info.plistに`ITSAppUsesNonExemptEncryption=false`、
   `TARGETED_DEVICE_FAMILY=1`(iPhone専用)を設定済み。
-  次はStep2(画面・ルーティングの雛形実装)に着手する。
+- 2026-09-17: 実装手順書 Step2(画面・ルーティングの雛形実装)完了。
+  ルーティングはReact Router不使用、`AppStateContext`(状態値の切り替え)で
+  一方向遷移を実装。HomeScreen(0〜10の数字ボタン、88px以上のタップ領域)、
+  TraceScreen、ResultScreen(3秒後に自動でホームへ戻る)、GalleryScreen、
+  RegisterScreen、SettingsScreenの6画面を骨組みで作成。
+  親モードへの入口は`ParentGateButton`(長押し900ms)で共通化し、
+  Home→Register(長押し)、Register→Settings(長押し)に配線。
+  `npm run build`成功、`npx cap sync ios`で反映済み。
+  次はStep3(機能1: 写真ライブラリ登録)に着手する。
