@@ -3,18 +3,16 @@ import { useAppState } from '../app/AppStateContext';
 import { ParentGateButton } from '../components/ParentGateButton';
 import { childCopy } from '../copy/childCopy';
 import { getRegisteredNumberIds } from '../data/photoRepository';
+import { ALL_NUMBER_IDS, isStamped, MAX_CARD_IMAGES } from '../data/progressLogic';
 import { getProgress } from '../data/progressRepository';
 import type { Progress } from '../data/progressTypes';
 import { useBottomBannerAd } from '../lib/useBottomBannerAd';
 import './screens.css';
 
-const NUMBERS = Array.from({ length: 11 }, (_, i) => i); // 0〜10
-
 function roundLabel(progress: Progress): string {
-  if (progress.lapCount > 0) {
-    return childCopy.home.lapLabel(3 + progress.lapCount);
-  }
-  return childCopy.home.roundLabel(progress.currentCardRound);
+  return progress.cycle > MAX_CARD_IMAGES
+    ? childCopy.home.lapLabel(progress.cycle)
+    : childCopy.home.roundLabel(progress.cycle);
 }
 
 export function HomeScreen() {
@@ -34,13 +32,11 @@ export function HomeScreen() {
       <h1>{childCopy.home.title}</h1>
       {progress && <p className="round-badge">{roundLabel(progress)}</p>}
       <div className="number-grid">
-        {NUMBERS.map((n) => {
-          const isRegistered = registered.has(n);
-          const isStamped = progress ? (progress.stamps[n] ?? 0) === progress.currentCardRound : false;
+        {ALL_NUMBER_IDS.map((n) => {
           const className = [
             'number-button',
-            isRegistered && 'number-button--registered',
-            isStamped && 'number-button--stamped',
+            registered.has(n) && 'number-button--registered',
+            progress && isStamped(progress, n) && 'number-button--stamped',
           ]
             .filter(Boolean)
             .join(' ');

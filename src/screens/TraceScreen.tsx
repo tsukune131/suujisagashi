@@ -1,13 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useAppState } from '../app/AppStateContext';
 import tutorialCarUrl from '../assets/tutorial-car.svg';
 import { childCopy } from '../copy/childCopy';
-import { saveArtwork, resolveArtworkUri } from '../data/artworkRepository';
+import { resolveArtworkUri, saveArtwork } from '../data/artworkRepository';
 import { getLastStrokeColor, setLastStrokeColor } from '../data/drawingPrefs';
 import { getPhotosByNumber, resolvePhotoUri } from '../data/photoRepository';
 import type { Photo } from '../data/photoTypes';
 import { recordStampIfNeeded } from '../data/progressRepository';
-import { compositeArtworkToPngBase64 } from '../lib/compositeArtwork';
+import { compositeArtwork } from '../lib/compositeArtwork';
+import { tutorialGuideCircle } from '../lib/coverLayout';
 import { completionHapticFeedback } from '../lib/haptics';
 import { refreshReminders } from '../lib/reminderSync';
 import { drawStroke, totalStrokeLength, type Point, type Stroke } from '../lib/strokes';
@@ -21,12 +22,21 @@ const COMPLETE_LENGTH_RATIO = 1.2;
 const RESULT_TRANSITION_DELAY_MS = 400;
 
 export function TraceScreen() {
-  const { selectedNumberId, navigate, setLastArtworkUri, setLastStampResult, isTutorialActive, finishTutorial } =
-    useAppState();
+  const {
+    selectedNumberId,
+    navigate,
+    setLastArtworkUri,
+    setLastStampResult,
+    isTutorialActive,
+    finishTutorial,
+  } = useAppState();
   const [photo, setPhoto] = useState<Photo | null | undefined>(undefined);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [imageReady, setImageReady] = useState(false);
   const [currentColor, setCurrentColor] = useState(DEFAULT_COLOR);
   const [canUndo, setCanUndo] = useState(false);
+  const [completing, setCompleting] = useState(false);
+  const [guideStyle, setGuideStyle] = useState<CSSProperties | null>(null);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const photoImgRef = useRef<HTMLImageElement>(null);
@@ -34,8 +44,7 @@ export function TraceScreen() {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const strokesRef = useRef<Stroke[]>([]);
   const drawingRef = useRef<{ pointerId: number; points: Point[] } | null>(null);
-  const completeThresholdRef = useRef(0);
-  const completedRef = useRef(false);
+  const completeThresholdRef = useRef(Number.POSITIVE_INFINITY);
 
   useEffect(() => {
     getLastStrokeColor().then((c) => {
@@ -61,10 +70,12 @@ export function TraceScreen() {
     });
   }, [selectedNumberId, isTutorialActive]);
 
+  // 画像のデコードが終わるまではキャンバスを用意せず、なぞりも完成判定も受け付けない
   useEffect(() => {
     const wrap = wrapRef.current;
     const canvas = canvasRef.current;
-    if (!wrap || !canvas || !photoUri) return;
+    const img = photoImgRef.current;
+    if (!imageReady || !wrap || !canvas || !img) return;
 
     const rect = wrap.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
@@ -74,9 +85,18 @@ export function TraceScreen() {
     if (!ctx) return;
     ctx.scale(dpr, dpr);
     ctxRef.current = ctx;
-
     completeThresholdRef.current = Math.hypot(rect.width, rect.height) * COMPLETE_LENGTH_RATIO;
-  }, [photoUri]);
+
+    if (isTutorialActive) {
+      const circle = tutorialGuideCircle(img.naturalWidth, img.naturalHeight, rect.width, rect.height);
+      setGuideStyle({
+        left: circle.x,
+        top: circle.y,
+        width: circle.diameter,
+        height: circle.diameter,
+      });
+    }
+  }, [imageReady, isTutorialActive]);
 
   const redraw = () => {
     const ctx = ctxRef.current;
@@ -95,36 +115,31 @@ export function TraceScreen() {
   };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    // マルチタッチ無効化: 既になぞり中なら追加の指は無視する
-    if (drawingRef.current) return;
+    // 準備前・完成処理中は描かせない。なぞり中の2本目以降の指は無視する(マルチタッチ無効化)
+    if (!ctxRef.current || completing || drawingRef.current) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     drawingRef.current = { pointerId: e.pointerId, points: [pointFromEvent(e)] };
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const drawing = drawingRef.current;
-    if (!drawing || drawing.pointerId !== e.pointerId) return;
+    const ctx = ctxRef.current;
+    if (!drawing || !ctx || drawing.pointerId !== e.pointerId) return;
     drawing.points.push(pointFromEvent(e));
     redraw();
-    drawStroke(ctxRef.current!, { color: currentColor, width: STROKE_WIDTH, points: drawing.points });
+    drawStroke(ctx, { color: currentColor, width: STROKE_WIDTH, points: drawing.points });
   };
 
   const finishStroke = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const drawing = drawingRef.current;
     if (!drawing || drawing.pointerId !== e.pointerId) return;
     drawingRef.current = null;
-    if (drawing.points.length >= 2) {
-      strokesRef.current.push({ color: currentColor, width: STROKE_WIDTH, points: drawing.points });
-      setCanUndo(true);
-      redraw();
-      checkCompletion();
-    }
-  };
-
-  const checkCompletion = () => {
-    if (completedRef.current) return;
+    if (drawing.points.length < 2) return;
+    strokesRef.current.push({ color: currentColor, width: STROKE_WIDTH, points: drawing.points });
+    setCanUndo(true);
+    redraw();
     if (totalStrokeLength(strokesRef.current) >= completeThresholdRef.current) {
-      completedRef.current = true;
+      setCompleting(true);
       window.setTimeout(() => void completeAndSave(), RESULT_TRANSITION_DELAY_MS);
     }
   };
@@ -136,27 +151,26 @@ export function TraceScreen() {
       navigate('result');
       return;
     }
+
     const wrap = wrapRef.current;
     const photoImg = photoImgRef.current;
     if (wrap && photoImg && photo) {
-      const rect = wrap.getBoundingClientRect();
-      const pngBase64 = compositeArtworkToPngBase64(
-        photoImg,
-        rect.width,
-        rect.height,
-        strokesRef.current,
-      );
-      const artwork = await saveArtwork({
-        photoId: photo.id,
-        numberId: photo.numberId,
-        pngBase64,
-        strokes: strokesRef.current,
-      });
-      const uri = await resolveArtworkUri(artwork.exportedImagePath);
-      setLastArtworkUri(uri);
-      const stampResult = await recordStampIfNeeded(photo.numberId);
-      setLastStampResult(stampResult);
-      void refreshReminders();
+      const strokes = strokesRef.current.slice();
+      try {
+        const rect = wrap.getBoundingClientRect();
+        const images = compositeArtwork(photoImg, rect.width, rect.height, strokes);
+        const artwork = await saveArtwork({
+          photoId: photo.id,
+          numberId: photo.numberId,
+          ...images,
+          strokes,
+        });
+        setLastArtworkUri(await resolveArtworkUri(artwork.thumbnailPath));
+        setLastStampResult(await recordStampIfNeeded(photo.numberId));
+        void refreshReminders();
+      } catch {
+        // 保存できなくても子どもの体験は止めない。結果画面は「保存した」と表示しない
+      }
     }
     navigate('result');
   };
@@ -175,7 +189,7 @@ export function TraceScreen() {
 
   const handleSelectColor = (color: string) => {
     setCurrentColor(color);
-    setLastStrokeColor(color);
+    void setLastStrokeColor(color);
   };
 
   if (!isTutorialActive && photo === null) {
@@ -204,8 +218,18 @@ export function TraceScreen() {
           : childCopy.trace.promptFor(selectedNumberId ?? 0)}
       </div>
       <div className="trace-canvas-wrap" ref={wrapRef}>
-        {photoUri && <img ref={photoImgRef} className="trace-photo" src={photoUri} alt="" />}
-        {isTutorialActive && !canUndo && <div className="tutorial-guide-ring" />}
+        {photoUri && (
+          <img
+            ref={photoImgRef}
+            className="trace-photo"
+            src={photoUri}
+            alt=""
+            onLoad={() => setImageReady(true)}
+          />
+        )}
+        {isTutorialActive && !canUndo && guideStyle && (
+          <div className="tutorial-guide-ring" style={guideStyle} />
+        )}
         <canvas
           ref={canvasRef}
           className="trace-canvas"
@@ -234,7 +258,7 @@ export function TraceScreen() {
             type="button"
             className="trace-tool-button"
             onClick={handleUndo}
-            disabled={!canUndo}
+            disabled={!canUndo || completing}
           >
             {childCopy.trace.undo}
           </button>
@@ -242,7 +266,7 @@ export function TraceScreen() {
             type="button"
             className="trace-tool-button"
             onClick={handleClearAll}
-            disabled={!canUndo}
+            disabled={!canUndo || completing}
           >
             {childCopy.trace.clearAll}
           </button>

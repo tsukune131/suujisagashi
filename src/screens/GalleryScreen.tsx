@@ -24,7 +24,7 @@ export function GalleryScreen() {
   useEffect(() => {
     getAllArtworks().then(async (list) => {
       const withUri = await Promise.all(
-        list.map(async (a) => ({ ...a, uri: await resolveArtworkUri(a.exportedImagePath) })),
+        list.map(async (a) => ({ ...a, uri: await resolveArtworkUri(a.thumbnailPath) })),
       );
       setArtworks(withUri);
     });

@@ -55,13 +55,15 @@ export function ResultScreen() {
     <div className="screen">
       <h1>{childCopy.result.found(selectedNumberId ?? 0)}</h1>
       {lastArtworkUri && (
-        <img
-          src={lastArtworkUri}
-          alt=""
-          style={{ maxWidth: 240, maxHeight: 240, borderRadius: 16 }}
-        />
+        <>
+          <img
+            src={lastArtworkUri}
+            alt=""
+            style={{ maxWidth: 240, maxHeight: 240, borderRadius: 16 }}
+          />
+          <p>{childCopy.result.savedToGallery}</p>
+        </>
       )}
-      <p>{childCopy.result.savedToGallery}</p>
       {isComplete && (
         <div className="complete-celebration">
           <p className="complete-celebration__title">{childCopy.result.completeTitle}</p>

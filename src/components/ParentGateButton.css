@@ -1,6 +1,6 @@
 .parent-gate-button {
   position: fixed;
-  bottom: 12px;
+  bottom: calc(12px + var(--banner-offset) + env(safe-area-inset-bottom));
   right: 12px;
   width: 40px;
   height: 40px;
@@ -15,4 +15,78 @@
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+.parent-gate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.parent-gate-dialog {
+  width: 100%;
+  max-width: 320px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  text-align: center;
+}
+
+.parent-gate-dialog h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.parent-gate-question {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.parent-gate-input {
+  min-height: 44px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: #f0f0f0;
+  font-size: 28px;
+  font-weight: bold;
+  line-height: 44px;
+}
+
+.parent-gate-error {
+  margin: 0 0 8px;
+  color: #c0392b;
+  font-size: 14px;
+}
+
+.parent-gate-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.parent-gate-keypad button,
+.parent-gate-actions button {
+  min-height: 48px;
+  border-radius: 10px;
+  border: none;
+  font-size: 18px;
+  background: #e8e8e8;
+}
+
+.parent-gate-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.parent-gate-actions button:last-child {
+  background: #4dabf7;
+  color: #fff;
+  font-weight: bold;
 }

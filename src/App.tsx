@@ -10,8 +10,8 @@ import { TraceScreen } from './screens/TraceScreen';
 function ScreenSwitcher() {
   const { screen, booted } = useAppState();
 
-  // 起動直後のチュートリアル要否チェック中は何も描画しない
-  // (Capacitorのスプラッシュ画面が隠してくれる)
+  // チュートリアル要否の判定(Preferences読み出し、数十ms)が終わるまで描画しない。
+  // ホームが一瞬見えてからチュートリアルに切り替わるちらつきを避けるため
   if (!booted) return null;
 
   switch (screen) {

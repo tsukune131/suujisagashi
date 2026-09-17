@@ -68,12 +68,17 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       justCompletedTutorial,
       navigate: setScreen,
       selectNumber: (numberId) => {
+        // 前回の結果を持ち越して「保存したよ」と誤表示しないよう、毎回リセットする
+        setLastArtworkUri(null);
+        setLastStampResult(null);
         setSelectedNumberId(numberId);
         setScreen('trace');
       },
       setLastArtworkUri,
       setLastStampResult,
       startTutorial: () => {
+        setLastArtworkUri(null);
+        setLastStampResult(null);
         setSelectedNumberId(TUTORIAL_NUMBER_ID);
         setIsTutorialActive(true);
         setScreen('trace');

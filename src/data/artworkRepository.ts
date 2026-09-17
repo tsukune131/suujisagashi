@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { Directory, Filesystem } from '@capacitor/filesystem';
+import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { Preferences } from '@capacitor/preferences';
 import type { NumberId } from '../app/types';
 import type { Stroke } from '../lib/strokes';
@@ -7,8 +7,6 @@ import type { Artwork } from './artworkTypes';
 
 const ARTWORKS_DIR = 'artworks';
 const ARTWORKS_PREFS_KEY = 'artworks';
-/** TraceDrawing相当: Artwork.id → ストローク配列。将来の再編集に備えて別途保持する。 */
-const STROKES_PREFS_KEY = 'artworkStrokes';
 
 async function ensureArtworksDir(): Promise<void> {
   try {
@@ -23,49 +21,52 @@ async function readArtworks(): Promise<Artwork[]> {
   return value ? (JSON.parse(value) as Artwork[]) : [];
 }
 
-async function writeArtworks(artworks: Artwork[]): Promise<void> {
-  await Preferences.set({ key: ARTWORKS_PREFS_KEY, value: JSON.stringify(artworks) });
-}
-
-async function readStrokesMap(): Promise<Record<string, Stroke[]>> {
-  const { value } = await Preferences.get({ key: STROKES_PREFS_KEY });
-  return value ? (JSON.parse(value) as Record<string, Stroke[]>) : {};
-}
-
 interface SaveArtworkParams {
   photoId: string;
   numberId: NumberId;
-  /** dataURLのprefixを除いたbase64文字列(PNG)。 */
-  pngBase64: string;
+  /** dataURLのprefixを除いたbase64文字列(JPEG)。 */
+  imageBase64: string;
+  thumbnailBase64: string;
   strokes: Stroke[];
 }
 
+/**
+ * 画像とストローク(TraceDrawing相当、将来の再編集用)はファイルに書き、
+ * Preferences(UserDefaults)には小さなメタデータだけを置く。
+ */
 export async function saveArtwork(params: SaveArtworkParams): Promise<Artwork> {
   await ensureArtworksDir();
 
   const id = crypto.randomUUID();
-  const exportedImagePath = `${ARTWORKS_DIR}/${id}.png`;
-  await Filesystem.writeFile({
-    path: exportedImagePath,
-    data: params.pngBase64,
-    directory: Directory.Data,
-  });
-
   const artwork: Artwork = {
     id,
     photoId: params.photoId,
     numberId: params.numberId,
-    exportedImagePath,
+    exportedImagePath: `${ARTWORKS_DIR}/${id}.jpg`,
+    thumbnailPath: `${ARTWORKS_DIR}/${id}_thumb.jpg`,
     createdAt: new Date().toISOString(),
   };
 
+  await Filesystem.writeFile({
+    path: artwork.exportedImagePath,
+    data: params.imageBase64,
+    directory: Directory.Data,
+  });
+  await Filesystem.writeFile({
+    path: artwork.thumbnailPath,
+    data: params.thumbnailBase64,
+    directory: Directory.Data,
+  });
+  await Filesystem.writeFile({
+    path: `${ARTWORKS_DIR}/${id}.strokes.json`,
+    data: JSON.stringify(params.strokes),
+    directory: Directory.Data,
+    encoding: Encoding.UTF8,
+  });
+
   const artworks = await readArtworks();
   artworks.push(artwork);
-  await writeArtworks(artworks);
-
-  const strokesMap = await readStrokesMap();
-  strokesMap[id] = params.strokes;
-  await Preferences.set({ key: STROKES_PREFS_KEY, value: JSON.stringify(strokesMap) });
+  await Preferences.set({ key: ARTWORKS_PREFS_KEY, value: JSON.stringify(artworks) });
 
   return artwork;
 }

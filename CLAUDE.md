@@ -46,7 +46,12 @@ Windows + GitHub Actions のみで開発・配布する(Macは使わない)。
   読ませると真っ白になる)
 - Capacitorプラグインは**静的import**(動的importで実機が固まった前例あり)
 - コード分割(React.lazy)は自前コードのみ可
-- ストレージ: Dexie(IndexedDB)。バックアップはiCloudのアプリコンテナ復元に委ねる
+- ストレージ: 小さなメタデータ(写真・作品の一覧、進行状況、設定)は Capacitor
+  Preferences、画像やストローク等の大きなデータは Filesystem(Directory.Data)。
+  **Preferences(=UserDefaults)に大きなデータを入れない**。
+  バックアップはiCloudのアプリコンテナ復元に委ねる
+- テスト: `npm test`(vitest)。ロジックは画面から切り出して純粋関数にしてテストする
+- 提出前: `npm run check:release`(テスト広告設定・テストApp IDの残存を検査)
 - TestFlight配布: Actions → iOS TestFlight → lane=beta(手順は docs/ios-release-setup.md)
 - Capability変更時は lane=refresh_profiles を先に実行
 

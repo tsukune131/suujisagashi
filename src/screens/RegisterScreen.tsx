@@ -13,7 +13,7 @@ type RegisterStep =
   | { kind: 'idle' }
   | { kind: 'tagging'; webPaths: string[] }
   | { kind: 'saving' }
-  | { kind: 'done' };
+  | { kind: 'done'; savedCount: number; failed: boolean };
 
 export function RegisterScreen() {
   const { navigate } = useAppState();
@@ -49,11 +49,18 @@ export function RegisterScreen() {
   const tagWithNumber = async (numberId: number) => {
     if (step.kind !== 'tagging') return;
     setStep({ kind: 'saving' });
+    let savedCount = 0;
+    let failed = false;
     for (const webPath of step.webPaths) {
-      await registerPhoto(webPath, numberId);
+      try {
+        await registerPhoto(webPath, numberId);
+        savedCount++;
+      } catch {
+        failed = true;
+      }
     }
     void refreshReminders();
-    setStep({ kind: 'done' });
+    setStep({ kind: 'done', savedCount, failed });
   };
 
   if (step.kind === 'tagging') {
@@ -88,7 +95,11 @@ export function RegisterScreen() {
   if (step.kind === 'done') {
     return (
       <div className="screen">
-        <h1>{parentCopy.register.done}</h1>
+        {step.failed ? (
+          <p>{parentCopy.register.failed(step.savedCount)}</p>
+        ) : (
+          <h1>{parentCopy.register.done}</h1>
+        )}
         <button
           type="button"
           className="screen-action-button"

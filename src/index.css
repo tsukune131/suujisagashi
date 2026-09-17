@@ -1,5 +1,7 @@
 :root {
   color-scheme: light;
+  /* 下帯バナーの高さ+余白。lib/ads.ts がバナー表示時に更新する */
+  --banner-offset: 0px;
 }
 
 * {
@@ -17,7 +19,7 @@ body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
   background: linear-gradient(180deg, #ffffff 0%, #eaf6ff 100%);
-  /* マルチタッチは既定で無効化(設計書 9. 非機能要件: 対象年齢に配慮した操作性) */
+  /* ダブルタップ拡大を無効化。なぞり中のマルチタッチ無視は TraceScreen 側で行う */
   touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;

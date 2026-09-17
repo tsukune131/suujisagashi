@@ -3,39 +3,64 @@ import { useAppState } from '../app/AppStateContext';
 import { usePro } from '../app/ProContext';
 import { parentCopy } from '../copy/parentCopy';
 import { getNotificationsEnabled, setNotificationsEnabled } from '../data/notificationPrefs';
-import { refreshReminders } from '../lib/reminderSync';
+import {
+  getNotificationPermission,
+  refreshReminders,
+  type NotificationPermission,
+} from '../lib/reminderSync';
 import './screens.css';
 
-/**
- * 親モード。写真管理・音量は後続Stepで実装する。
- */
 export function SettingsScreen() {
   const { navigate, startTutorial } = useAppState();
-  const { isPro, priceString, purchasing, restoring, purchase, restore } = usePro();
+  const {
+    isPro,
+    priceString,
+    priceStatus,
+    purchasing,
+    restoring,
+    restoreOutcome,
+    purchase,
+    restore,
+  } = usePro();
   const [notificationsEnabled, setNotificationsEnabledState] = useState(true);
+  const [permission, setPermission] = useState<NotificationPermission>('unsupported');
 
   useEffect(() => {
-    getNotificationsEnabled().then(setNotificationsEnabledState);
+    void getNotificationsEnabled().then(setNotificationsEnabledState);
+    void getNotificationPermission().then(setPermission);
   }, []);
 
   const toggleNotifications = async () => {
     const next = !notificationsEnabled;
     setNotificationsEnabledState(next);
     await setNotificationsEnabled(next);
-    void refreshReminders();
+    await refreshReminders();
+    setPermission(await getNotificationPermission());
   };
+
+  const purchaseLabel = purchasing
+    ? parentCopy.pro.purchasing
+    : priceStatus === 'ready' && priceString
+      ? parentCopy.pro.purchaseButton(priceString)
+      : priceStatus === 'loading'
+        ? parentCopy.pro.priceLoading
+        : parentCopy.pro.priceUnavailable;
 
   return (
     <div className="screen">
       <h1>{parentCopy.settings.title}</h1>
-      <p>({parentCopy.settings.placeholderNote})</p>
 
       <div className="pro-section">
         <h2>{parentCopy.notifications.heading}</h2>
         <p>{parentCopy.notifications.description}</p>
         <button type="button" className="screen-action-button" onClick={toggleNotifications}>
-          {notificationsEnabled ? parentCopy.notifications.toggleOn : parentCopy.notifications.toggleOff}
+          {notificationsEnabled
+            ? parentCopy.notifications.toggleOn
+            : parentCopy.notifications.toggleOff}
         </button>
+        {notificationsEnabled && permission === 'denied' && (
+          <p>{parentCopy.notifications.deniedByOs}</p>
+        )}
       </div>
 
       <div className="pro-section">
@@ -44,29 +69,26 @@ export function SettingsScreen() {
         {isPro ? (
           <p>{parentCopy.pro.alreadyPurchased}</p>
         ) : (
-          <>
-            <button
-              type="button"
-              className="screen-action-button"
-              onClick={purchase}
-              disabled={!priceString || purchasing}
-            >
-              {purchasing
-                ? parentCopy.pro.purchasing
-                : priceString
-                  ? parentCopy.pro.purchaseButton(priceString)
-                  : parentCopy.pro.priceUnavailable}
-            </button>
-            <button
-              type="button"
-              className="screen-action-button"
-              onClick={restore}
-              disabled={restoring}
-            >
-              {restoring ? parentCopy.pro.restoring : parentCopy.pro.restoreButton}
-            </button>
-          </>
+          <button
+            type="button"
+            className="screen-action-button"
+            onClick={purchase}
+            disabled={priceStatus !== 'ready' || purchasing}
+          >
+            {purchaseLabel}
+          </button>
         )}
+        {/* iap-onetime: 「購入を復元」は購入後も残す */}
+        <button
+          type="button"
+          className="screen-action-button"
+          onClick={restore}
+          disabled={restoring}
+        >
+          {restoring ? parentCopy.pro.restoring : parentCopy.pro.restoreButton}
+        </button>
+        {restoreOutcome === 'notFound' && <p>{parentCopy.pro.restoreNotFound}</p>}
+        {restoreOutcome === 'failed' && <p>{parentCopy.pro.restoreFailed}</p>}
       </div>
 
       <button type="button" className="screen-action-button" onClick={startTutorial}>

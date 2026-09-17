@@ -125,9 +125,15 @@ Part Aの前提どおりパーソナライズ広告・IDFA取得を行わない�
 | 今回のStep8実装 | Google公式テストID(即使用可、登録不要) |
 | Step10(リリース準備)直前 | Part A-2/A-3で取得した本番ID に差し替え |
 
-本番IDが発行されたら、`capacitor.config.ts`または環境別の設定ファイルに
-反映する(テストIDのハードコードのまま提出しないよう、Step10の
-`release-auditor`監査項目に追加しておく)。
+本番IDが発行されたら、次の3か所を変える:
+
+1. `src/lib/adConfig.ts` の `PRODUCTION_AD_UNIT_IDS` にバナー/インタースティシャルのIDを入れる
+2. 同ファイルの `USE_TEST_ADS` を `false` にする
+   (`initializeForTesting` / `isTesting` もこの値に連動する)
+3. `ios/App/App/Info.plist` の `GADApplicationIdentifier` を本番のAdMobアプリIDにする
+
+変更後に `npm run check:release` を実行し「提出前チェックOK」になることを確認する。
+テスト設定が1つでも残っていると失敗する。
 
 ---
 
