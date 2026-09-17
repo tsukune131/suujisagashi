@@ -7,7 +7,11 @@ import { SettingsScreen } from './screens/SettingsScreen';
 import { TraceScreen } from './screens/TraceScreen';
 
 function ScreenSwitcher() {
-  const { screen } = useAppState();
+  const { screen, booted } = useAppState();
+
+  // 起動直後のチュートリアル要否チェック中は何も描画しない
+  // (Capacitorのスプラッシュ画面が隠してくれる)
+  if (!booted) return null;
 
   switch (screen) {
     case 'home':

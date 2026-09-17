@@ -39,6 +39,29 @@
   touch-action: none;
 }
 
+.tutorial-guide-ring {
+  position: absolute;
+  left: 31%;
+  top: 76%;
+  width: 18%;
+  aspect-ratio: 1;
+  border: 6px dashed #fff;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  animation: tutorial-guide-blink 1s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes tutorial-guide-blink {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 .trace-empty {
   position: absolute;
   inset: 0;

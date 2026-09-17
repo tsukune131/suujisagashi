@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppState } from '../app/AppStateContext';
+import tutorialCarUrl from '../assets/tutorial-car.svg';
 import { saveArtwork, resolveArtworkUri } from '../data/artworkRepository';
 import { getLastStrokeColor, setLastStrokeColor } from '../data/drawingPrefs';
 import { getPhotosByNumber, resolvePhotoUri } from '../data/photoRepository';
@@ -17,7 +18,8 @@ const COMPLETE_LENGTH_RATIO = 1.2;
 const RESULT_TRANSITION_DELAY_MS = 400;
 
 export function TraceScreen() {
-  const { selectedNumberId, navigate, setLastArtworkUri, setLastStampResult } = useAppState();
+  const { selectedNumberId, navigate, setLastArtworkUri, setLastStampResult, isTutorialActive, finishTutorial } =
+    useAppState();
   const [photo, setPhoto] = useState<Photo | null | undefined>(undefined);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [currentColor, setCurrentColor] = useState(DEFAULT_COLOR);
@@ -40,6 +42,10 @@ export function TraceScreen() {
 
   useEffect(() => {
     if (selectedNumberId == null) return;
+    if (isTutorialActive) {
+      setPhotoUri(tutorialCarUrl);
+      return;
+    }
     getPhotosByNumber(selectedNumberId).then(async (photos) => {
       if (photos.length === 0) {
         setPhoto(null);
@@ -50,7 +56,7 @@ export function TraceScreen() {
       setPhoto(chosen);
       setPhotoUri(uri);
     });
-  }, [selectedNumberId]);
+  }, [selectedNumberId, isTutorialActive]);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -121,6 +127,11 @@ export function TraceScreen() {
   };
 
   const completeAndSave = async () => {
+    if (isTutorialActive) {
+      finishTutorial();
+      navigate('result');
+      return;
+    }
     const wrap = wrapRef.current;
     const photoImg = photoImgRef.current;
     if (wrap && photoImg && photo) {
@@ -162,7 +173,7 @@ export function TraceScreen() {
     setLastStrokeColor(color);
   };
 
-  if (photo === null) {
+  if (!isTutorialActive && photo === null) {
     return (
       <div className="trace-screen">
         <div className="trace-header">{selectedNumberId}を さがそう!</div>
@@ -184,9 +195,12 @@ export function TraceScreen() {
 
   return (
     <div className="trace-screen">
-      <div className="trace-header">{selectedNumberId}を さがそう!</div>
+      <div className="trace-header">
+        {isTutorialActive ? 'ゆびで なぞってみよう!' : `${selectedNumberId}を さがそう!`}
+      </div>
       <div className="trace-canvas-wrap" ref={wrapRef}>
         {photoUri && <img ref={photoImgRef} className="trace-photo" src={photoUri} alt="" />}
+        {isTutorialActive && !canUndo && <div className="tutorial-guide-ring" />}
         <canvas
           ref={canvasRef}
           className="trace-canvas"
