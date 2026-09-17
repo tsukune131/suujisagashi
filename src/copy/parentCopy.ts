@@ -21,6 +21,12 @@ export const parentCopy = {
     replayTutorial: 'あそびかたを もういちど みる',
     back: 'もどる',
   },
+  notifications: {
+    heading: 'おしらせ',
+    description: '写真登録やコンプリートまであと少しの時に、控えめにお知らせします。',
+    toggleOn: 'おしらせ ON',
+    toggleOff: 'おしらせ OFF',
+  },
   pro: {
     heading: '広告を消す',
     description: '買い切りで、これ以降ずっと広告が表示されなくなります。',

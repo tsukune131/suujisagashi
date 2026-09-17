@@ -3,6 +3,7 @@ import type { NumberId, ScreenName } from './types';
 import type { StampResult } from '../data/progressTypes';
 import { getHasSeenTutorial, setHasSeenTutorial } from '../data/tutorialPrefs';
 import { initializeAds } from '../lib/ads';
+import { refreshReminders } from '../lib/reminderSync';
 
 const TUTORIAL_NUMBER_ID: NumberId = 0;
 
@@ -49,6 +50,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         setSelectedNumberId(TUTORIAL_NUMBER_ID);
         setIsTutorialActive(true);
         setScreen('trace');
+      } else {
+        void refreshReminders();
       }
       setBooted(true);
     });
@@ -79,6 +82,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         void setHasSeenTutorial();
         setIsTutorialActive(false);
         setJustCompletedTutorial(true);
+        void refreshReminders();
       },
       clearJustCompletedTutorial: () => setJustCompletedTutorial(false),
     }),

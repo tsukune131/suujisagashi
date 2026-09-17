@@ -9,6 +9,7 @@ import type { Photo } from '../data/photoTypes';
 import { recordStampIfNeeded } from '../data/progressRepository';
 import { compositeArtworkToPngBase64 } from '../lib/compositeArtwork';
 import { completionHapticFeedback } from '../lib/haptics';
+import { refreshReminders } from '../lib/reminderSync';
 import { drawStroke, totalStrokeLength, type Point, type Stroke } from '../lib/strokes';
 import './TraceScreen.css';
 
@@ -155,6 +156,7 @@ export function TraceScreen() {
       setLastArtworkUri(uri);
       const stampResult = await recordStampIfNeeded(photo.numberId);
       setLastStampResult(stampResult);
+      void refreshReminders();
     }
     navigate('result');
   };

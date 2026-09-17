@@ -4,6 +4,7 @@ import { useAppState } from '../app/AppStateContext';
 import { ParentGateButton } from '../components/ParentGateButton';
 import { parentCopy } from '../copy/parentCopy';
 import { registerPhoto } from '../data/photoRepository';
+import { refreshReminders } from '../lib/reminderSync';
 import './screens.css';
 
 const NUMBERS = Array.from({ length: 11 }, (_, i) => i); // 0〜10
@@ -51,6 +52,7 @@ export function RegisterScreen() {
     for (const webPath of step.webPaths) {
       await registerPhoto(webPath, numberId);
     }
+    void refreshReminders();
     setStep({ kind: 'done' });
   };
 
