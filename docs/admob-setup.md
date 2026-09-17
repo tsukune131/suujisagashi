@@ -71,6 +71,10 @@ MVPの必須事項ではない。
 
 ## Part B: App Store Connect側の手続き(ユーザー作業)
 
+> 実装状況: `ios/App/App/Info.plist`に`GADApplicationIdentifier`(テストID)・
+> `SKAdNetworkItems`(Google自身のID1件のみ)を設定済み。本番提出前に
+> B-1/B-2の内容で差し替え・追記が必要。
+
 ### B-1. Info.plistへの反映(コード側で対応、確認のみ)
 
 A-2で取得したAdMobアプリIDを、実装時に以下へ設定する:

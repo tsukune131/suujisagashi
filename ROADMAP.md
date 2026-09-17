@@ -157,7 +157,18 @@ Web/PWAのまま、毎日使って気持ちいいレベルまで磨く。
   `npm run check:copy`(正規表現でCJK漢字の混入をチェック)を追加。
   `npm run build`成功、`npm run check:copy`成功、`npx cap sync ios`で
   4プラグインの組み込みを確認。ブラウザ拡張が未接続のため目視確認は未実施。
-  次はStep8(AdMob広告)に着手する。
+- 2026-09-17: 実装手順書 Step8(AdMob広告)完了。docs/admob-setup.mdの確認事項に
+  沿って、Google公式テスト広告ID(登録不要)で実装。`@capacitor-community/admob`
+  を導入し、`initialize()`に`tagForChildDirectedTreatment: true`・
+  `maxAdContentRating: General`を設定、広告リクエストは常時`npa: true`
+  (非パーソナライズ)。下帯固定バナーはHome/Galleryにマウントされている間だけ
+  表示する`useBottomBannerAd`フックで実装(なぞり中は自動的に非表示)。
+  完了演出→ホーム戻りのタイミングでN=4回に1回インタースティシャルを表示
+  (Preferencesでカウンタ管理)。Info.plistに`GADApplicationIdentifier`
+  (テストID)と`SKAdNetworkItems`(暫定1件)を追加。ATT許可ダイアログは
+  方針どおり実装しない。`npm run build`/`check:copy`成功、`npx cap sync ios`
+  で5プラグインの組み込みを確認。ブラウザ拡張が未接続のため目視確認は未実施。
+  次はStep8.5(広告非表示プラン・買い切りIAP)に着手する。
 
 ## 素材の未着手事項
 

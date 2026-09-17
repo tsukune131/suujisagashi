@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAppState } from '../app/AppStateContext';
 import { childCopy } from '../copy/childCopy';
+import { maybeShowInterstitialAfterResult } from '../lib/ads';
 import './screens.css';
 
 const AUTO_RETURN_MS = 3000;
@@ -35,7 +36,9 @@ export function ResultScreen() {
       return () => window.clearTimeout(timer);
     }
     const delay = isComplete ? COMPLETE_AUTO_RETURN_MS : AUTO_RETURN_MS;
-    const timer = window.setTimeout(() => navigate('home'), delay);
+    const timer = window.setTimeout(() => {
+      void maybeShowInterstitialAfterResult().finally(() => navigate('home'));
+    }, delay);
     return () => window.clearTimeout(timer);
   }, [navigate, isComplete, justCompletedTutorial, clearJustCompletedTutorial]);
 

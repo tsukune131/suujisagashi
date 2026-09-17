@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import type { NumberId, ScreenName } from './types';
 import type { StampResult } from '../data/progressTypes';
 import { getHasSeenTutorial, setHasSeenTutorial } from '../data/tutorialPrefs';
+import { initializeAds } from '../lib/ads';
 
 const TUTORIAL_NUMBER_ID: NumberId = 0;
 
@@ -42,6 +43,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const [justCompletedTutorial, setJustCompletedTutorial] = useState(false);
 
   useEffect(() => {
+    void initializeAds();
     getHasSeenTutorial().then((seen) => {
       if (!seen) {
         setSelectedNumberId(TUTORIAL_NUMBER_ID);

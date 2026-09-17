@@ -5,6 +5,7 @@ import { childCopy } from '../copy/childCopy';
 import { getRegisteredNumberIds } from '../data/photoRepository';
 import { getProgress } from '../data/progressRepository';
 import type { Progress } from '../data/progressTypes';
+import { useBottomBannerAd } from '../lib/useBottomBannerAd';
 import './screens.css';
 
 const NUMBERS = Array.from({ length: 11 }, (_, i) => i); // 0〜10
@@ -20,6 +21,8 @@ export function HomeScreen() {
   const { selectNumber, navigate } = useAppState();
   const [registered, setRegistered] = useState<Set<number>>(new Set());
   const [progress, setProgress] = useState<Progress | null>(null);
+
+  useBottomBannerAd();
 
   useEffect(() => {
     getRegisteredNumberIds().then(setRegistered);
