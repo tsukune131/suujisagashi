@@ -117,4 +117,13 @@ Web/PWAのまま、毎日使って気持ちいいレベルまで磨く。
   対象の数字に写真が未登録の場合の案内表示も追加。
   `npm run build`成功、`npx cap sync ios`で反映済み。ブラウザ拡張が
   未接続のため目視確認は未実施。
-  次はStep5(機能3: 保存・ギャラリー)に着手する。
+- 2026-09-17: 実装手順書 Step5(機能3: 保存・ギャラリー)完了。
+  完成判定発火時に、画面表示中の写真+ストロークを1枚のCanvasに合成して
+  PNG化(`compositeArtworkToPngBase64`)し、`artworkRepository`でFilesystemに
+  保存、メタデータ(Artwork: id/photoId/numberId/exportedImagePath/createdAt)を
+  Preferencesに保持。ストローク配列も別途保持(TraceDrawing相当、将来の再編集用)。
+  ResultScreenに保存確認のプレビュー画像を表示。GalleryScreenを実装し、
+  数字別フィルタ+新しい順/古い順の並べ替えでArtwork一覧をグリッド表示。
+  `npm run build`成功、`npx cap sync ios`で反映済み。ブラウザ拡張が
+  未接続のため目視確認は未実施。
+  次はStep5.5(機能4: 達成スタンプ表示)に着手する。

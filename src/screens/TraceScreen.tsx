@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppState } from '../app/AppStateContext';
+import { saveArtwork, resolveArtworkUri } from '../data/artworkRepository';
 import { getLastStrokeColor, setLastStrokeColor } from '../data/drawingPrefs';
 import { getPhotosByNumber, resolvePhotoUri } from '../data/photoRepository';
 import type { Photo } from '../data/photoTypes';
+import { compositeArtworkToPngBase64 } from '../lib/compositeArtwork';
 import { drawStroke, totalStrokeLength, type Point, type Stroke } from '../lib/strokes';
 import './TraceScreen.css';
 
@@ -14,13 +16,14 @@ const COMPLETE_LENGTH_RATIO = 1.2;
 const RESULT_TRANSITION_DELAY_MS = 400;
 
 export function TraceScreen() {
-  const { selectedNumberId, navigate } = useAppState();
+  const { selectedNumberId, navigate, setLastArtworkUri } = useAppState();
   const [photo, setPhoto] = useState<Photo | null | undefined>(undefined);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [currentColor, setCurrentColor] = useState(DEFAULT_COLOR);
   const [canUndo, setCanUndo] = useState(false);
 
   const wrapRef = useRef<HTMLDivElement>(null);
+  const photoImgRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const strokesRef = useRef<Stroke[]>([]);
@@ -112,8 +115,31 @@ export function TraceScreen() {
     if (completedRef.current) return;
     if (totalStrokeLength(strokesRef.current) >= completeThresholdRef.current) {
       completedRef.current = true;
-      window.setTimeout(() => navigate('result'), RESULT_TRANSITION_DELAY_MS);
+      window.setTimeout(() => void completeAndSave(), RESULT_TRANSITION_DELAY_MS);
     }
+  };
+
+  const completeAndSave = async () => {
+    const wrap = wrapRef.current;
+    const photoImg = photoImgRef.current;
+    if (wrap && photoImg && photo) {
+      const rect = wrap.getBoundingClientRect();
+      const pngBase64 = compositeArtworkToPngBase64(
+        photoImg,
+        rect.width,
+        rect.height,
+        strokesRef.current,
+      );
+      const artwork = await saveArtwork({
+        photoId: photo.id,
+        numberId: photo.numberId,
+        pngBase64,
+        strokes: strokesRef.current,
+      });
+      const uri = await resolveArtworkUri(artwork.exportedImagePath);
+      setLastArtworkUri(uri);
+    }
+    navigate('result');
   };
 
   const handleUndo = () => {
@@ -157,7 +183,7 @@ export function TraceScreen() {
     <div className="trace-screen">
       <div className="trace-header">{selectedNumberId}を さがそう!</div>
       <div className="trace-canvas-wrap" ref={wrapRef}>
-        {photoUri && <img className="trace-photo" src={photoUri} alt="" />}
+        {photoUri && <img ref={photoImgRef} className="trace-photo" src={photoUri} alt="" />}
         <canvas
           ref={canvasRef}
           className="trace-canvas"
