@@ -126,4 +126,14 @@ Web/PWAのまま、毎日使って気持ちいいレベルまで磨く。
   数字別フィルタ+新しい順/古い順の並べ替えでArtwork一覧をグリッド表示。
   `npm run build`成功、`npx cap sync ios`で反映済み。ブラウザ拡張が
   未接続のため目視確認は未実施。
-  次はStep5.5(機能4: 達成スタンプ表示)に着手する。
+- 2026-09-17: 実装手順書 Step5.5(機能4: 達成スタンプ表示)完了。
+  `progressRepository`でnumberId別スタンプ(lastStampedRound相当)・
+  currentCardRound(1〜3)・lapCount(4週目以降)をPreferencesに保持。
+  Artwork保存後に`recordStampIfNeeded`を呼び、同じカード回数内の重複加算を防止。
+  0〜10すべて揃った瞬間だけcompletedRound=trueを返し、3未満ならcurrentCardRound
+  を+1、3の場合はlapCountを+1(カード画像は3枚目を使い回す想定)。
+  HomeScreenに達成バッジ(★)と「いまは{N}まいめ」/「【Nしゅうめ】」表示を追加、
+  ResultScreenにコンプリート時の大きめの祝福演出(表示時間も延長)を追加。
+  `npm run build`成功、`npx cap sync ios`で反映済み。ブラウザ拡張が
+  未接続のため目視確認は未実施。
+  次はStep6(初回チュートリアル)に着手する。

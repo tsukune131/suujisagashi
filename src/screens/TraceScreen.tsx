@@ -4,6 +4,7 @@ import { saveArtwork, resolveArtworkUri } from '../data/artworkRepository';
 import { getLastStrokeColor, setLastStrokeColor } from '../data/drawingPrefs';
 import { getPhotosByNumber, resolvePhotoUri } from '../data/photoRepository';
 import type { Photo } from '../data/photoTypes';
+import { recordStampIfNeeded } from '../data/progressRepository';
 import { compositeArtworkToPngBase64 } from '../lib/compositeArtwork';
 import { drawStroke, totalStrokeLength, type Point, type Stroke } from '../lib/strokes';
 import './TraceScreen.css';
@@ -16,7 +17,7 @@ const COMPLETE_LENGTH_RATIO = 1.2;
 const RESULT_TRANSITION_DELAY_MS = 400;
 
 export function TraceScreen() {
-  const { selectedNumberId, navigate, setLastArtworkUri } = useAppState();
+  const { selectedNumberId, navigate, setLastArtworkUri, setLastStampResult } = useAppState();
   const [photo, setPhoto] = useState<Photo | null | undefined>(undefined);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [currentColor, setCurrentColor] = useState(DEFAULT_COLOR);
@@ -138,6 +139,8 @@ export function TraceScreen() {
       });
       const uri = await resolveArtworkUri(artwork.exportedImagePath);
       setLastArtworkUri(uri);
+      const stampResult = await recordStampIfNeeded(photo.numberId);
+      setLastStampResult(stampResult);
     }
     navigate('result');
   };
