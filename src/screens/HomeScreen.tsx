@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAppState } from '../app/AppStateContext';
 import { ParentGateButton } from '../components/ParentGateButton';
+import { childCopy } from '../copy/childCopy';
 import { getRegisteredNumberIds } from '../data/photoRepository';
 import { getProgress } from '../data/progressRepository';
 import type { Progress } from '../data/progressTypes';
@@ -10,9 +11,9 @@ const NUMBERS = Array.from({ length: 11 }, (_, i) => i); // 0〜10
 
 function roundLabel(progress: Progress): string {
   if (progress.lapCount > 0) {
-    return `【${3 + progress.lapCount}しゅうめ】`;
+    return childCopy.home.lapLabel(3 + progress.lapCount);
   }
-  return `いまは ${progress.currentCardRound}まいめ`;
+  return childCopy.home.roundLabel(progress.currentCardRound);
 }
 
 export function HomeScreen() {
@@ -27,7 +28,7 @@ export function HomeScreen() {
 
   return (
     <div className="screen">
-      <h1>すうじさがし</h1>
+      <h1>{childCopy.home.title}</h1>
       {progress && <p className="round-badge">{roundLabel(progress)}</p>}
       <div className="number-grid">
         {NUMBERS.map((n) => {
@@ -47,12 +48,8 @@ export function HomeScreen() {
           );
         })}
       </div>
-      <button
-        type="button"
-        className="screen-action-button"
-        onClick={() => navigate('gallery')}
-      >
-        ギャラリー
+      <button type="button" className="screen-action-button" onClick={() => navigate('gallery')}>
+        {childCopy.home.gallery}
       </button>
       <ParentGateButton onActivate={() => navigate('register')} />
     </div>

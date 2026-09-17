@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAppState } from '../app/AppStateContext';
+import { childCopy } from '../copy/childCopy';
 import { getAllArtworks, resolveArtworkUri } from '../data/artworkRepository';
 import type { Artwork } from '../data/artworkTypes';
 import './GalleryScreen.css';
@@ -37,14 +38,14 @@ export function GalleryScreen() {
 
   return (
     <div className="gallery-screen">
-      <h1 className="gallery-header">ギャラリー</h1>
+      <h1 className="gallery-header">{childCopy.gallery.title}</h1>
       <div className="gallery-filter-row">
         <button
           type="button"
           className={`gallery-filter-button${numberFilter === 'all' ? ' gallery-filter-button--active' : ''}`}
           onClick={() => setNumberFilter('all')}
         >
-          すべて
+          {childCopy.gallery.all}
         </button>
         {NUMBER_FILTERS.map((n) => (
           <button
@@ -63,11 +64,11 @@ export function GalleryScreen() {
           className="gallery-filter-button"
           onClick={() => setSortOrder((s) => (s === 'new' ? 'old' : 'new'))}
         >
-          {sortOrder === 'new' ? '新しい順' : '古い順'}
+          {sortOrder === 'new' ? childCopy.gallery.sortNew : childCopy.gallery.sortOld}
         </button>
       </div>
       {visible.length === 0 ? (
-        <div className="gallery-empty">まだ さくひんが ないよ。すうじを さがしに いこう!</div>
+        <div className="gallery-empty">{childCopy.gallery.empty}</div>
       ) : (
         <div className="gallery-grid">
           {visible.map((a) => (
@@ -79,7 +80,7 @@ export function GalleryScreen() {
         </div>
       )}
       <button type="button" className="gallery-filter-button" onClick={() => navigate('home')}>
-        ホームに もどる
+        {childCopy.gallery.backHome}
       </button>
     </div>
   );

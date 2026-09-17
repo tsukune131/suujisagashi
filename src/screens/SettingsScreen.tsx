@@ -1,4 +1,5 @@
 import { useAppState } from '../app/AppStateContext';
+import { parentCopy } from '../copy/parentCopy';
 import './screens.css';
 
 /**
@@ -9,17 +10,13 @@ export function SettingsScreen() {
 
   return (
     <div className="screen">
-      <h1>せってい</h1>
-      <p>(写真管理・音量・広告関連は後続Stepで実装)</p>
+      <h1>{parentCopy.settings.title}</h1>
+      <p>({parentCopy.settings.placeholderNote})</p>
       <button type="button" className="screen-action-button" onClick={startTutorial}>
-        あそびかたを もういちど みる
+        {parentCopy.settings.replayTutorial}
       </button>
-      <button
-        type="button"
-        className="screen-action-button"
-        onClick={() => navigate('home')}
-      >
-        もどる
+      <button type="button" className="screen-action-button" onClick={() => navigate('home')}>
+        {parentCopy.settings.back}
       </button>
     </div>
   );

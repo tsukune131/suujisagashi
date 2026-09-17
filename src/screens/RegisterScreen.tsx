@@ -2,6 +2,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { useState } from 'react';
 import { useAppState } from '../app/AppStateContext';
 import { ParentGateButton } from '../components/ParentGateButton';
+import { parentCopy } from '../copy/parentCopy';
 import { registerPhoto } from '../data/photoRepository';
 import './screens.css';
 
@@ -56,8 +57,8 @@ export function RegisterScreen() {
   if (step.kind === 'tagging') {
     return (
       <div className="screen">
-        <h1>どの すうじに する?</h1>
-        <p>{step.webPaths.length}まい の しゃしんを とうろくします</p>
+        <h1>{parentCopy.register.taggingTitle}</h1>
+        <p>{parentCopy.register.taggingCount(step.webPaths.length)}</p>
         <div className="number-grid">
           {NUMBERS.map((n) => (
             <button
@@ -77,7 +78,7 @@ export function RegisterScreen() {
   if (step.kind === 'saving') {
     return (
       <div className="screen">
-        <h1>とうろく しています…</h1>
+        <h1>{parentCopy.register.saving}</h1>
       </div>
     );
   }
@@ -85,16 +86,16 @@ export function RegisterScreen() {
   if (step.kind === 'done') {
     return (
       <div className="screen">
-        <h1>とうろく できたよ!</h1>
+        <h1>{parentCopy.register.done}</h1>
         <button
           type="button"
           className="screen-action-button"
           onClick={() => setStep({ kind: 'idle' })}
         >
-          つづけて とうろくする
+          {parentCopy.register.continueRegistering}
         </button>
         <button type="button" className="screen-action-button" onClick={() => navigate('home')}>
-          ホームに もどる
+          {parentCopy.register.backToHome}
         </button>
       </div>
     );
@@ -102,19 +103,15 @@ export function RegisterScreen() {
 
   return (
     <div className="screen">
-      <h1>しゃしんの とうろく</h1>
+      <h1>{parentCopy.register.title}</h1>
       <button type="button" className="screen-action-button" onClick={pickFromLibrary}>
-        あるものから えらぶ
+        {parentCopy.register.pickFromLibrary}
       </button>
       <button type="button" className="screen-action-button" onClick={takePhoto}>
-        しゃしんを とる
+        {parentCopy.register.takePhoto}
       </button>
-      <button
-        type="button"
-        className="screen-action-button"
-        onClick={() => navigate('home')}
-      >
-        もどる
+      <button type="button" className="screen-action-button" onClick={() => navigate('home')}>
+        {parentCopy.register.back}
       </button>
       <ParentGateButton onActivate={() => navigate('settings')} />
     </div>

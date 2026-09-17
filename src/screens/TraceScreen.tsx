@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppState } from '../app/AppStateContext';
 import tutorialCarUrl from '../assets/tutorial-car.svg';
+import { childCopy } from '../copy/childCopy';
 import { saveArtwork, resolveArtworkUri } from '../data/artworkRepository';
 import { getLastStrokeColor, setLastStrokeColor } from '../data/drawingPrefs';
 import { getPhotosByNumber, resolvePhotoUri } from '../data/photoRepository';
 import type { Photo } from '../data/photoTypes';
 import { recordStampIfNeeded } from '../data/progressRepository';
 import { compositeArtworkToPngBase64 } from '../lib/compositeArtwork';
+import { completionHapticFeedback } from '../lib/haptics';
 import { drawStroke, totalStrokeLength, type Point, type Stroke } from '../lib/strokes';
 import './TraceScreen.css';
 
@@ -127,6 +129,7 @@ export function TraceScreen() {
   };
 
   const completeAndSave = async () => {
+    void completionHapticFeedback();
     if (isTutorialActive) {
       finishTutorial();
       navigate('result');
@@ -176,16 +179,14 @@ export function TraceScreen() {
   if (!isTutorialActive && photo === null) {
     return (
       <div className="trace-screen">
-        <div className="trace-header">{selectedNumberId}を さがそう!</div>
+        <div className="trace-header">{childCopy.trace.promptFor(selectedNumberId ?? 0)}</div>
         <div className="trace-canvas-wrap">
-          <div className="trace-empty">
-            まだ この すうじの しゃしんが ないよ。おうちのひとに とうろくしてもらおう!
-          </div>
+          <div className="trace-empty">{childCopy.trace.emptyPhoto}</div>
         </div>
         <div className="trace-toolbar">
           <div className="trace-buttons">
             <button type="button" className="trace-tool-button" onClick={() => navigate('home')}>
-              ホームに もどる
+              {childCopy.trace.backHome}
             </button>
           </div>
         </div>
@@ -196,7 +197,9 @@ export function TraceScreen() {
   return (
     <div className="trace-screen">
       <div className="trace-header">
-        {isTutorialActive ? 'ゆびで なぞってみよう!' : `${selectedNumberId}を さがそう!`}
+        {isTutorialActive
+          ? childCopy.trace.tutorialPrompt
+          : childCopy.trace.promptFor(selectedNumberId ?? 0)}
       </div>
       <div className="trace-canvas-wrap" ref={wrapRef}>
         {photoUri && <img ref={photoImgRef} className="trace-photo" src={photoUri} alt="" />}
@@ -219,7 +222,7 @@ export function TraceScreen() {
               type="button"
               className={`color-swatch${c === currentColor ? ' color-swatch--selected' : ''}`}
               style={{ background: c }}
-              aria-label="いろを えらぶ"
+              aria-label={childCopy.trace.colorSwatchLabel}
               onClick={() => handleSelectColor(c)}
             />
           ))}
@@ -231,7 +234,7 @@ export function TraceScreen() {
             onClick={handleUndo}
             disabled={!canUndo}
           >
-            やりなおす
+            {childCopy.trace.undo}
           </button>
           <button
             type="button"
@@ -239,7 +242,7 @@ export function TraceScreen() {
             onClick={handleClearAll}
             disabled={!canUndo}
           >
-            ぜんぶ けす
+            {childCopy.trace.clearAll}
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { childCopy } from '../copy/childCopy';
 import './ParentGateButton.css';
 
 const LONG_PRESS_MS = 900;
@@ -31,7 +32,7 @@ export function ParentGateButton({ onActivate, label = '⚙' }: ParentGateButton
     <button
       type="button"
       className="parent-gate-button"
-      aria-label="おうちのひと用メニュー"
+      aria-label={childCopy.parentGate.ariaLabel}
       onPointerDown={start}
       onPointerUp={cancel}
       onPointerLeave={cancel}

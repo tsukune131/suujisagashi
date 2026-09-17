@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useAppState } from '../app/AppStateContext';
+import { childCopy } from '../copy/childCopy';
 import './screens.css';
 
 const AUTO_RETURN_MS = 3000;
@@ -41,15 +42,15 @@ export function ResultScreen() {
   if (justCompletedTutorial) {
     return (
       <div className="screen">
-        <h1>{selectedNumberId}を みつけられたね!</h1>
-        <p>じゃあ じぶんの しゃしんで やってみよう!</p>
+        <h1>{childCopy.result.found(selectedNumberId ?? 0)}</h1>
+        <p>{childCopy.result.tutorialNext}</p>
       </div>
     );
   }
 
   return (
     <div className="screen">
-      <h1>{selectedNumberId}を みつけられたね!</h1>
+      <h1>{childCopy.result.found(selectedNumberId ?? 0)}</h1>
       {lastArtworkUri && (
         <img
           src={lastArtworkUri}
@@ -57,11 +58,11 @@ export function ResultScreen() {
           style={{ maxWidth: 240, maxHeight: 240, borderRadius: 16 }}
         />
       )}
-      <p>ギャラリーに ほぞんしたよ</p>
+      <p>{childCopy.result.savedToGallery}</p>
       {isComplete && (
         <div className="complete-celebration">
-          <p className="complete-celebration__title">🎉 ぜんぶの すうじが みつかったね! 🎉</p>
-          <p>すごいすごい!</p>
+          <p className="complete-celebration__title">{childCopy.result.completeTitle}</p>
+          <p>{childCopy.result.completeSub}</p>
         </div>
       )}
     </div>
