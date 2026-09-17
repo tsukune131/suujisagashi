@@ -99,4 +99,13 @@ Web/PWAのまま、毎日使って気持ちいいレベルまで磨く。
   親モードへの入口は`ParentGateButton`(長押し900ms)で共通化し、
   Home→Register(長押し)、Register→Settings(長押し)に配線。
   `npm run build`成功、`npx cap sync ios`で反映済み。
-  次はStep3(機能1: 写真ライブラリ登録)に着手する。
+- 2026-09-17: 実装手順書 Step3(機能1: 写真ライブラリ登録)完了。
+  `@capacitor/camera`(`pickImages()`=PHPicker複数選択、`getPhoto()`=その場撮影)、
+  `@capacitor/filesystem`(画像本体を長辺1200px/サムネイル320pxにリサイズして
+  Directory.Dataへ保存)、`@capacitor/preferences`(Photoメタデータの
+  JSON配列を保持)を実装。RegisterScreenに選択→数字タグ付け→保存のフローを追加、
+  HomeScreenの数字ボタンに登録済みバッジ(★)を反映。
+  Info.plistに`NSCameraUsageDescription`/`NSPhotoLibraryUsageDescription`を追加。
+  `npm run build`成功、`npx cap sync ios`で3プラグインの組み込みを確認。
+  ブラウザ拡張が未接続のため実機/ブラウザでの目視確認は未実施(HTTPレスポンスのみ確認)。
+  次はStep4(機能2: なぞり描画)に着手する。

@@ -26,6 +26,10 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>すうじさがしで あそぶ しゃしんを その場で とるために つかいます</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>すうじさがしで あそぶ しゃしんを えらぶために つかいます</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

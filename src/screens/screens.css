@@ -24,6 +24,7 @@
 }
 
 .number-button {
+  position: relative;
   min-width: 88px;
   min-height: 88px;
   border-radius: 20px;
@@ -33,6 +34,19 @@
   background: #ffe680;
   color: #4a3b00;
   touch-action: manipulation;
+}
+
+.number-button--registered {
+  background: #ffb84d;
+  box-shadow: 0 0 0 4px #ffe680 inset;
+}
+
+.number-button--registered::after {
+  content: '★';
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  font-size: 18px;
 }
 
 .screen-action-button {
