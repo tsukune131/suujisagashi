@@ -3,7 +3,6 @@ import { useAppState } from '../app/AppStateContext';
 import { childCopy } from '../copy/childCopy';
 import { getAllArtworks, resolveArtworkUri } from '../data/artworkRepository';
 import type { Artwork } from '../data/artworkTypes';
-import { useBottomBannerAd } from '../lib/useBottomBannerAd';
 import './GalleryScreen.css';
 
 const NUMBER_FILTERS = Array.from({ length: 11 }, (_, i) => i); // 0〜10
@@ -18,8 +17,6 @@ export function GalleryScreen() {
   const [artworks, setArtworks] = useState<ArtworkWithUri[]>([]);
   const [numberFilter, setNumberFilter] = useState<number | 'all'>('all');
   const [sortOrder, setSortOrder] = useState<SortOrder>('new');
-
-  useBottomBannerAd();
 
   useEffect(() => {
     getAllArtworks().then(async (list) => {

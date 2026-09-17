@@ -3,6 +3,7 @@ import { useAppState } from '../app/AppStateContext';
 import { usePro } from '../app/ProContext';
 import { parentCopy } from '../copy/parentCopy';
 import { getNotificationsEnabled, setNotificationsEnabled } from '../data/notificationPrefs';
+import { FREE_PHOTO_LIMIT } from '../lib/proConfig';
 import {
   getNotificationPermission,
   refreshReminders,
@@ -65,7 +66,7 @@ export function SettingsScreen() {
 
       <div className="pro-section">
         <h2>{parentCopy.pro.heading}</h2>
-        <p>{parentCopy.pro.description}</p>
+        <p>{parentCopy.pro.description(FREE_PHOTO_LIMIT)}</p>
         {isPro ? (
           <p>{parentCopy.pro.alreadyPurchased}</p>
         ) : (

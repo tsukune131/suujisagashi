@@ -6,7 +6,6 @@ import { getRegisteredNumberIds } from '../data/photoRepository';
 import { ALL_NUMBER_IDS, isStamped, MAX_CARD_IMAGES } from '../data/progressLogic';
 import { getProgress } from '../data/progressRepository';
 import type { Progress } from '../data/progressTypes';
-import { useBottomBannerAd } from '../lib/useBottomBannerAd';
 import './screens.css';
 
 function roundLabel(progress: Progress): string {
@@ -19,8 +18,6 @@ export function HomeScreen() {
   const { selectNumber, navigate } = useAppState();
   const [registered, setRegistered] = useState<Set<number>>(new Set());
   const [progress, setProgress] = useState<Progress | null>(null);
-
-  useBottomBannerAd();
 
   useEffect(() => {
     getRegisteredNumberIds().then(setRegistered);

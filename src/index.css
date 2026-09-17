@@ -1,7 +1,5 @@
 :root {
   color-scheme: light;
-  /* 下帯バナーの高さ+余白。lib/ads.ts がバナー表示時に更新する */
-  --banner-offset: 0px;
 }
 
 * {

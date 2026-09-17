@@ -24,6 +24,11 @@ export const parentCopy = {
       `保存できなかった写真があります(${savedCount}枚は登録済み)。端末の空き容量を確認して、もう一度お試しください。`,
     continueRegistering: 'つづけて とうろくする',
     backToHome: 'ホームに もどる',
+    remaining: (n: number) => `無料版であと ${n}枚 登録できます。`,
+    limitReached: (limit: number) =>
+      `無料版の上限(${limit}枚)まで登録しました。もっと登録するには、下のボタンから買い切りプランを購入してください。`,
+    taggingSkipped: (n: number) =>
+      `無料版の上限のため、${n}枚は登録されませんでした。もっと登録するには買い切りプランが必要です。`,
   },
   settings: {
     title: 'せってい',
@@ -39,13 +44,14 @@ export const parentCopy = {
       'iPhoneの設定で通知が許可されていないため、お知らせは届きません。「設定」アプリ→「すうじさがし」→「通知」から許可してください。',
   },
   pro: {
-    heading: '広告を消す',
-    description: '買い切りで、これ以降ずっと広告が表示されなくなります。',
+    heading: '写真をもっと登録する',
+    description: (limit: number) =>
+      `無料版は写真を${limit}枚まで登録できます。買い切りで、登録できる枚数が無制限になります。`,
     purchaseButton: (priceString: string) => `${priceString} で購入`,
     purchasing: '購入処理中…',
     priceLoading: '価格を読み込み中…',
     priceUnavailable: '価格を取得できませんでした。電波の良い場所でもう一度お試しください。',
-    alreadyPurchased: '購入済みです。広告は表示されません。',
+    alreadyPurchased: '購入済みです。写真は無制限に登録できます。',
     restoreButton: '購入を復元',
     restoring: '復元処理中…',
     restoreFailed: '復元できませんでした。通信状況を確認して、もう一度お試しください。',
