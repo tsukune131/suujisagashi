@@ -168,7 +168,18 @@ Web/PWAのまま、毎日使って気持ちいいレベルまで磨く。
   (テストID)と`SKAdNetworkItems`(暫定1件)を追加。ATT許可ダイアログは
   方針どおり実装しない。`npm run build`/`check:copy`成功、`npx cap sync ios`
   で5プラグインの組み込みを確認。ブラウザ拡張が未接続のため目視確認は未実施。
-  次はStep8.5(広告非表示プラン・買い切りIAP)に着手する。
+- 2026-09-17: 実装手順書 Step8.5(広告非表示プラン・買い切りIAP)完了。
+  docs/iap-onetime-setup.mdの確認事項に沿って実装。`@capgo/native-purchases`
+  (StoreKit 2直叩き、RevenueCat等は不使用)で`ProContext`を実装し、
+  `getPurchases({onlyCurrentEntitlements:true})`で購入状態を確認、
+  StoreKitに問い合わせられない場合は直近の既知の値(Preferences)に
+  フォールバックする(`確認失敗時にfalseへ倒さない`方針)。`@capacitor/app`の
+  `resume`イベントで前面復帰時に価格・購入状態を再取得。SettingsScreenに
+  価格表示付き購入ボタン(価格取得前は非活性)・購入を復元ボタンを追加。
+  `lib/ads.ts`のバナー/インタースティシャルは購入済みなら何も表示しないよう
+  ガード済み。`npm run build`/`check:copy`成功、`npx cap sync ios`で
+  7プラグインの組み込みを確認。ブラウザ拡張が未接続のため目視確認は未実施。
+  次はStep8.6(リテンション通知)に着手する。
 
 ## 素材の未着手事項
 

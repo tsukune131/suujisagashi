@@ -5,6 +5,7 @@ import {
   MaxAdContentRating,
 } from '@capacitor-community/admob';
 import { incrementInterstitialCounter, resetInterstitialCounter } from '../data/adPrefs';
+import { getLastKnownIsPro } from '../data/proPrefs';
 import { BANNER_AD_UNIT_ID, INTERSTITIAL_AD_UNIT_ID, INTERSTITIAL_FREQUENCY } from './adConfig';
 import { isNativeApp } from './platform';
 
@@ -29,9 +30,9 @@ export async function initializeAds(): Promise<void> {
   }
 }
 
-/** Home/Galleryの下帯固定バナー。 */
+/** Home/Galleryの下帯固定バナー。広告非表示プラン購入済みなら何もしない。 */
 export async function showBottomBanner(): Promise<void> {
-  if (!isNativeApp) return;
+  if (!isNativeApp || (await getLastKnownIsPro())) return;
   try {
     await AdMob.showBanner({
       adId: BANNER_AD_UNIT_ID,
@@ -59,7 +60,7 @@ export async function hideBottomBanner(): Promise<void> {
  * (完了演出の直後には割り込ませない。設計書「8. 収益化(広告)設計」)。
  */
 export async function maybeShowInterstitialAfterResult(): Promise<void> {
-  if (!isNativeApp) return;
+  if (!isNativeApp || (await getLastKnownIsPro())) return;
   const count = await incrementInterstitialCounter();
   if (count < INTERSTITIAL_FREQUENCY) return;
   await resetInterstitialCounter();

@@ -17,8 +17,18 @@ export const parentCopy = {
   },
   settings: {
     title: 'せってい',
-    placeholderNote: '写真管理・音量・広告関連は後続Stepで実装する',
+    placeholderNote: '写真管理・音量は後続Stepで実装する',
     replayTutorial: 'あそびかたを もういちど みる',
     back: 'もどる',
+  },
+  pro: {
+    heading: '広告を消す',
+    description: '買い切りで、これ以降ずっと広告が表示されなくなります。',
+    purchaseButton: (priceString: string) => `${priceString} で購入`,
+    purchasing: '購入処理中…',
+    priceUnavailable: '価格を取得できませんでした。電波の良い場所でもう一度お試しください。',
+    alreadyPurchased: '購入済みです。広告は表示されません。',
+    restoreButton: '購入を復元',
+    restoring: '復元処理中…',
   },
 };

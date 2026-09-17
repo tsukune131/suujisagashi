@@ -1,4 +1,5 @@
 import { AppStateProvider, useAppState } from './app/AppStateContext';
+import { ProProvider } from './app/ProContext';
 import { GalleryScreen } from './screens/GalleryScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { RegisterScreen } from './screens/RegisterScreen';
@@ -31,8 +32,10 @@ function ScreenSwitcher() {
 
 export function App() {
   return (
-    <AppStateProvider>
-      <ScreenSwitcher />
-    </AppStateProvider>
+    <ProProvider>
+      <AppStateProvider>
+        <ScreenSwitcher />
+      </AppStateProvider>
+    </ProProvider>
   );
 }
