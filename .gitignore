@@ -1,0 +1,19 @@
+node_modules/
+dist/
+build/
+
+# iOS (Capacitor が生成する非管理物)
+ios/App/Pods/
+ios/App/App/public/
+ios/DerivedData/
+
+# 実機スクリーンショットの元画像(実データが写るため手元のみ)
+photo/
+
+# Apple/GitHub側の設定手順など、秘密やアカウント情報が混ざる手元用ドキュメント
+# (公開リポジトリに入れない場合はコメントを外す)
+# docs/
+
+.env
+*.p8
+*.mobileprovision
