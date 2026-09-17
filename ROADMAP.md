@@ -108,4 +108,13 @@ Web/PWAのまま、毎日使って気持ちいいレベルまで磨く。
   Info.plistに`NSCameraUsageDescription`/`NSPhotoLibraryUsageDescription`を追加。
   `npm run build`成功、`npx cap sync ios`で3プラグインの組み込みを確認。
   ブラウザ拡張が未接続のため実機/ブラウザでの目視確認は未実施(HTTPレスポンスのみ確認)。
-  次はStep4(機能2: なぞり描画)に着手する。
+- 2026-09-17: 実装手順書 Step4(機能2: なぞり描画)完了。
+  TraceScreenに写真レイヤー(`<img>`)+描画レイヤー(`<canvas>`)を実装。
+  Pointer Eventsでストロークを取得し、マルチタッチは1本目以外を無視。
+  カラーパレット(7色)・前回使用色の記憶(Preferences)・「ぜんぶ けす」・
+  ストローク単位のアンドゥを実装。形一致判定は行わず、なぞった線の
+  合計長さがキャンバス対角線の1.2倍を超えたら自動でResultScreenへ遷移。
+  対象の数字に写真が未登録の場合の案内表示も追加。
+  `npm run build`成功、`npx cap sync ios`で反映済み。ブラウザ拡張が
+  未接続のため目視確認は未実施。
+  次はStep5(機能3: 保存・ギャラリー)に着手する。
