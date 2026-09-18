@@ -325,3 +325,23 @@ GitHub Actionsでcertificates→betaレーンを実行、TestFlight配信まで�
   線の長さ条件を免除する。保存データも線とスタンプ両方を記録
   (`${id}.drawing.json`)するよう`artworkRepository`を更新
 - `npm run build`/`npm test`(14件)/`npm run check:copy`成功
+
+## 完成方法を60秒モード/せいげんなしモードに置き換え(2026-09-18 続き)
+
+なぞる本数を数字にひもづける自動判定(`requiredStrokeCount`)は、実際に
+遊んでみると判定基準が分かりにくいという声を受け、**「60秒経ったら自動で
+完成」「せいげんなしモードは"かんせい!"ボタンで自分から完成させる」の
+2モードに置き換えた**。旧ロジック(`requiredStrokeCount`/
+`totalStrokeLength`によるストローク本数・長さの自動判定)は完全に撤去。
+
+- `PhotoSelectScreen`に「⏱ 60びょう」「♾ せいげんなし」のモード切り替えを追加。
+  写真が1枚の数字はモードを選んだ瞬間になぞり画面へ、2枚以上ある数字は
+  写真選択と併用
+- 60秒モード: なぞり画面右上に円形ゲージ(`TimerRing`)を表示し、色が
+  減っていく形で残り時間を示す。0になった瞬間に自動で完成・保存
+- せいげんなしモード: ツールバーに「かんせい!」ボタンを表示し、
+  タップした時点で完成・保存(線・スタンプの本数や長さは問わない)
+- チュートリアルは「せいげんなし」固定(従来どおり1本なぞればボタンで完了)
+- `src/lib/strokes.ts`から`requiredStrokeCount`/`totalStrokeLength`と
+  そのテストを削除(呼び出し元が無くなったため)
+- `npm run build`/`npm test`(10件)/`npm run check:copy`成功

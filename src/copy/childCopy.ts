@@ -9,6 +9,8 @@ export const childCopy = {
     title: (numberId: number) => `${numberId}の しゃしんは どれに する?`,
     emptyPhoto: 'まだ この すうじの しゃしんが ないよ。おうちのひとに とうろくしてもらおう!',
     backHome: 'ホームに もどる',
+    modeTimed: '60びょう',
+    modeUnlimited: 'せいげんなし',
   },
   trace: {
     promptFor: (numberId: number) => `${numberId}を さがそう!`,
@@ -18,6 +20,7 @@ export const childCopy = {
     colorSwatchLabel: 'いろを えらぶ',
     penTool: 'かく',
     stampTool: 'スタンプ',
+    completeButton: 'かんせい!',
   },
   result: {
     found: (numberId: number) => `${numberId}を みつけられたね!`,

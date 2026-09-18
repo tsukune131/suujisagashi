@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useAppState } from '../app/AppStateContext';
 import tutorialCarUrl from '../assets/tutorial-car.svg';
 import { NumberDots } from '../components/NumberDots';
+import { TimerRing } from '../components/TimerRing';
 import { childCopy } from '../copy/childCopy';
 import { resolveArtworkUri, saveArtwork } from '../data/artworkRepository';
 import { getLastStrokeColor, setLastStrokeColor } from '../data/drawingPrefs';
@@ -13,15 +14,15 @@ import { tutorialGuideCircle } from '../lib/coverLayout';
 import { completionHapticFeedback } from '../lib/haptics';
 import { refreshReminders } from '../lib/reminderSync';
 import { createStamp, drawStamp, STAMP_FONT_SIZE_PX, type Stamp } from '../lib/stamps';
-import { drawStroke, requiredStrokeCount, totalStrokeLength, type Point, type Stroke } from '../lib/strokes';
+import { drawStroke, type Point, type Stroke } from '../lib/strokes';
 import './TraceScreen.css';
 
 const COLORS = ['#ff5b5b', '#ffa94d', '#ffd43b', '#69db7c', '#4dabf7', '#b197fc', '#ff8fab'];
 const DEFAULT_COLOR = COLORS[0];
 const STROKE_WIDTH = 16;
-/** 「完成」とみなす、なぞった線の合計長さ。キャンバス対角線の1.2倍を目安にする。 */
-const COMPLETE_LENGTH_RATIO = 1.2;
 const RESULT_TRANSITION_DELAY_MS = 400;
+const TIMED_MODE_DURATION_MS = 60_000;
+const TIMER_TICK_MS = 100;
 
 type Tool = 'pen' | 'stamp';
 type DrawAction = { kind: 'stroke'; stroke: Stroke } | { kind: 'stamp'; stamp: Stamp };
@@ -30,6 +31,7 @@ export function TraceScreen() {
   const {
     selectedNumberId,
     selectedPhotoId,
+    traceMode,
     navigate,
     setLastArtworkUri,
     setLastStampResult,
@@ -44,6 +46,7 @@ export function TraceScreen() {
   const [canUndo, setCanUndo] = useState(false);
   const [completing, setCompleting] = useState(false);
   const [guideStyle, setGuideStyle] = useState<CSSProperties | null>(null);
+  const [remainingMs, setRemainingMs] = useState(TIMED_MODE_DURATION_MS);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const photoImgRef = useRef<HTMLImageElement>(null);
@@ -51,7 +54,7 @@ export function TraceScreen() {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const actionsRef = useRef<DrawAction[]>([]);
   const drawingRef = useRef<{ pointerId: number; points: Point[] } | null>(null);
-  const completeThresholdRef = useRef(Number.POSITIVE_INFINITY);
+  const completingRef = useRef(false);
 
   useEffect(() => {
     getLastStrokeColor().then((c) => {
@@ -94,7 +97,6 @@ export function TraceScreen() {
     if (!ctx) return;
     ctx.scale(dpr, dpr);
     ctxRef.current = ctx;
-    completeThresholdRef.current = Math.hypot(rect.width, rect.height) * COMPLETE_LENGTH_RATIO;
 
     if (isTutorialActive) {
       const circle = tutorialGuideCircle(img.naturalWidth, img.naturalHeight, rect.width, rect.height);
@@ -106,6 +108,22 @@ export function TraceScreen() {
       });
     }
   }, [imageReady, isTutorialActive]);
+
+  // 60秒モード: 準備ができたらカウントダウンを始め、0になったら自動で完成させる
+  useEffect(() => {
+    if (traceMode !== 'timed' || !imageReady) return;
+    const startedAt = Date.now();
+    const id = window.setInterval(() => {
+      const remaining = Math.max(0, TIMED_MODE_DURATION_MS - (Date.now() - startedAt));
+      setRemainingMs(remaining);
+      if (remaining <= 0) {
+        window.clearInterval(id);
+        triggerCompletion();
+      }
+    }, TIMER_TICK_MS);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [traceMode, imageReady]);
 
   const redraw = () => {
     const ctx = ctxRef.current;
@@ -127,19 +145,11 @@ export function TraceScreen() {
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   };
 
-  const checkCompletion = () => {
-    const strokeActions = actionsRef.current.filter((a) => a.kind === 'stroke');
-    const stampCount = actionsRef.current.length - strokeActions.length;
-    const actionCount = actionsRef.current.length;
-    const enoughActions = actionCount >= requiredStrokeCount(selectedNumberId ?? 0);
-    // スタンプは1個でも置けば十分な意思表示とみなし、線の合計長さは問わない
-    const enoughEffort =
-      stampCount > 0 ||
-      totalStrokeLength(strokeActions.map((a) => a.stroke)) >= completeThresholdRef.current;
-    if (enoughActions && enoughEffort) {
-      setCompleting(true);
-      window.setTimeout(() => void completeAndSave(), RESULT_TRANSITION_DELAY_MS);
-    }
+  const triggerCompletion = () => {
+    if (completingRef.current) return;
+    completingRef.current = true;
+    setCompleting(true);
+    window.setTimeout(() => void completeAndSave(), RESULT_TRANSITION_DELAY_MS);
   };
 
   const placeStamp = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -150,7 +160,6 @@ export function TraceScreen() {
     });
     setCanUndo(true);
     redraw();
-    checkCompletion();
   };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -184,7 +193,6 @@ export function TraceScreen() {
     });
     setCanUndo(true);
     redraw();
-    checkCompletion();
   };
 
   const completeAndSave = async () => {
@@ -284,6 +292,11 @@ export function TraceScreen() {
         {isTutorialActive && !canUndo && guideStyle && (
           <div className="tutorial-guide-ring" style={guideStyle} />
         )}
+        {traceMode === 'timed' && (
+          <div className="trace-timer">
+            <TimerRing progress={remainingMs / TIMED_MODE_DURATION_MS} />
+          </div>
+        )}
         <canvas
           ref={canvasRef}
           className="trace-canvas"
@@ -340,6 +353,16 @@ export function TraceScreen() {
           >
             {childCopy.trace.clearAll}
           </button>
+          {traceMode === 'unlimited' && (
+            <button
+              type="button"
+              className="trace-tool-button trace-tool-button--complete"
+              onClick={triggerCompletion}
+              disabled={completing}
+            >
+              {childCopy.trace.completeButton}
+            </button>
+          )}
         </div>
       </div>
     </div>

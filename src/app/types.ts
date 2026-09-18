@@ -9,3 +9,6 @@ export type ScreenName =
 
 /** 0〜10。将来の拡張(Phase 4: 11以降)を見据えて number 型のまま持つ。 */
 export type NumberId = number;
+
+/** なぞり画面の完成方法。60秒経過で自動完成 / 「かんせい!」ボタンで手動完成。 */
+export type TraceMode = 'timed' | 'unlimited';

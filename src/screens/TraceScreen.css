@@ -70,6 +70,13 @@
   }
 }
 
+.trace-timer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  pointer-events: none;
+}
+
 .trace-empty {
   position: absolute;
   inset: 0;
@@ -171,4 +178,10 @@
 .trace-tool-button:disabled {
   opacity: 0.4;
   box-shadow: none;
+}
+
+.trace-tool-button--complete {
+  background: linear-gradient(180deg, var(--candy-3-hi), var(--candy-3-lo));
+  color: var(--candy-3-ink);
+  box-shadow: 0 3px 0 var(--candy-3-shadow);
 }

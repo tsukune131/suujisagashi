@@ -16,6 +16,36 @@
   margin: 0;
 }
 
+.photo-select-mode-toggle {
+  display: flex;
+  gap: 10px;
+}
+
+.photo-select-mode-button {
+  min-width: 120px;
+  min-height: 56px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: none;
+  font-size: 17px;
+  font-weight: bold;
+  background: linear-gradient(180deg, #ffffff, #e8e8e8);
+  color: #666;
+  box-shadow: 0 3px 0 #c8c8c8;
+  touch-action: manipulation;
+  transition: transform 0.08s ease;
+}
+
+.photo-select-mode-button--active {
+  background: linear-gradient(180deg, var(--candy-3-hi), var(--candy-3-lo));
+  color: var(--candy-3-ink);
+  box-shadow: 0 3px 0 var(--candy-3-shadow);
+}
+
+.photo-select-mode-button:active {
+  transform: translateY(2px);
+}
+
 .photo-select-grid {
   flex: 1;
   width: 100%;

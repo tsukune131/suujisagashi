@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import type { NumberId, ScreenName } from './types';
+import type { NumberId, ScreenName, TraceMode } from './types';
 import type { StampResult } from '../data/progressTypes';
 import { getHasSeenTutorial, setHasSeenTutorial } from '../data/tutorialPrefs';
 import { refreshReminders } from '../lib/reminderSync';
 
 const TUTORIAL_NUMBER_ID: NumberId = 0;
+const TUTORIAL_TRACE_MODE: TraceMode = 'unlimited';
 
 interface AppState {
   screen: ScreenName;
@@ -14,6 +15,8 @@ interface AppState {
   selectedNumberId: NumberId | null;
   /** なぞり画面で対象にしている写真のID。PhotoSelectScreenで確定させる。 */
   selectedPhotoId: string | null;
+  /** なぞり画面の完成方法。PhotoSelectScreenで確定させる。 */
+  traceMode: TraceMode | null;
   /** 直近で保存した作品の表示用URI。ResultScreenの保存確認に使う。 */
   lastArtworkUri: string | null;
   /** 直近のスタンプ結果。0〜10コンプリート時のみ completedRound が true になる。 */
@@ -23,10 +26,10 @@ interface AppState {
   /** チュートリアル完了直後の1回だけ true。ResultScreenが読み終えたらリセットする。 */
   justCompletedTutorial: boolean;
   navigate: (screen: ScreenName) => void;
-  /** ホームで数字を選んだ時に呼ぶ。写真が複数あるか未確定なので PhotoSelectScreen へ渡す。 */
+  /** ホームで数字を選んだ時に呼ぶ。写真とモードが未確定なので PhotoSelectScreen へ渡す。 */
   selectNumber: (numberId: NumberId) => void;
-  /** PhotoSelectScreenで写真を確定させた時に呼ぶ。 */
-  selectPhoto: (photoId: string) => void;
+  /** PhotoSelectScreenで写真とモードを確定させた時に呼ぶ。 */
+  selectPhoto: (photoId: string, mode: TraceMode) => void;
   setLastArtworkUri: (uri: string | null) => void;
   setLastStampResult: (result: StampResult | null) => void;
   /** 設定画面の「あそびかたを もういちど みる」から呼ぶ。 */
@@ -43,6 +46,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const [booted, setBooted] = useState(false);
   const [selectedNumberId, setSelectedNumberId] = useState<NumberId | null>(null);
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
+  const [traceMode, setTraceMode] = useState<TraceMode | null>(null);
   const [lastArtworkUri, setLastArtworkUri] = useState<string | null>(null);
   const [lastStampResult, setLastStampResult] = useState<StampResult | null>(null);
   const [isTutorialActive, setIsTutorialActive] = useState(false);
@@ -52,6 +56,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     getHasSeenTutorial().then((seen) => {
       if (!seen) {
         setSelectedNumberId(TUTORIAL_NUMBER_ID);
+        setTraceMode(TUTORIAL_TRACE_MODE);
         setIsTutorialActive(true);
         setScreen('trace');
       } else {
@@ -67,6 +72,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       booted,
       selectedNumberId,
       selectedPhotoId,
+      traceMode,
       lastArtworkUri,
       lastStampResult,
       isTutorialActive,
@@ -77,11 +83,13 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         setLastArtworkUri(null);
         setLastStampResult(null);
         setSelectedPhotoId(null);
+        setTraceMode(null);
         setSelectedNumberId(numberId);
         setScreen('photoSelect');
       },
-      selectPhoto: (photoId) => {
+      selectPhoto: (photoId, mode) => {
         setSelectedPhotoId(photoId);
+        setTraceMode(mode);
         setScreen('trace');
       },
       setLastArtworkUri,
@@ -90,6 +98,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         setLastArtworkUri(null);
         setLastStampResult(null);
         setSelectedPhotoId(null);
+        setTraceMode(TUTORIAL_TRACE_MODE);
         setSelectedNumberId(TUTORIAL_NUMBER_ID);
         setIsTutorialActive(true);
         setScreen('trace');
@@ -107,6 +116,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       booted,
       selectedNumberId,
       selectedPhotoId,
+      traceMode,
       lastArtworkUri,
       lastStampResult,
       isTutorialActive,

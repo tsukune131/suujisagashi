@@ -1,0 +1,12 @@
+.timer-ring {
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+}
+
+.timer-ring__track {
+  stroke: rgba(255, 255, 255, 0.4);
+}
+
+.timer-ring__fill {
+  stroke: #ffa94d;
+  transition: stroke-dashoffset 0.1s linear;
+}
