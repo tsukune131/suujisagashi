@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAppState } from '../app/AppStateContext';
+import { NumberDots } from '../components/NumberDots';
 import { ParentGateButton } from '../components/ParentGateButton';
 import { childCopy } from '../copy/childCopy';
 import { getRegisteredNumberIds } from '../data/photoRepository';
@@ -42,6 +43,7 @@ export function HomeScreen() {
           return (
             <button key={n} type="button" className={className} onClick={() => selectNumber(n)}>
               {n}
+              <NumberDots count={n} />
             </button>
           );
         })}

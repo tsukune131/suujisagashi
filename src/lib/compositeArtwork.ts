@@ -1,4 +1,5 @@
 import { coverLayout } from './coverLayout';
+import { drawStamp, STAMP_FONT_SIZE_PX, type Stamp } from './stamps';
 import { drawStroke, type Stroke } from './strokes';
 
 /** 作品本体は登録写真と同じく長辺1200px程度に抑える(設計書「6. データモデル」)。 */
@@ -35,6 +36,7 @@ export function compositeArtwork(
   containerWidth: number,
   containerHeight: number,
   strokes: Stroke[],
+  stamps: Stamp[],
 ): { imageBase64: string; thumbnailBase64: string } {
   const outputScale = Math.min(
     window.devicePixelRatio || 1,
@@ -61,6 +63,9 @@ export function compositeArtwork(
   );
   for (const stroke of strokes) {
     drawStroke(ctx, stroke);
+  }
+  for (const stamp of stamps) {
+    drawStamp(ctx, stamp, STAMP_FONT_SIZE_PX);
   }
 
   const thumbScale = THUMBNAIL_LONG_EDGE / Math.max(canvas.width, canvas.height);

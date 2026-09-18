@@ -2,6 +2,7 @@ import { AppStateProvider, useAppState } from './app/AppStateContext';
 import { ProProvider } from './app/ProContext';
 import { GalleryScreen } from './screens/GalleryScreen';
 import { HomeScreen } from './screens/HomeScreen';
+import { PhotoSelectScreen } from './screens/PhotoSelectScreen';
 import { RegisterScreen } from './screens/RegisterScreen';
 import { ResultScreen } from './screens/ResultScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
@@ -17,6 +18,8 @@ function ScreenSwitcher() {
   switch (screen) {
     case 'home':
       return <HomeScreen />;
+    case 'photoSelect':
+      return <PhotoSelectScreen />;
     case 'trace':
       return <TraceScreen />;
     case 'result':

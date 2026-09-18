@@ -1,0 +1,25 @@
+.number-dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 2px;
+  max-width: 46px;
+}
+
+.number-dots__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.75;
+}
+
+.number-dots--empty {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  opacity: 0.6;
+}

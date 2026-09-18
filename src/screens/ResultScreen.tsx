@@ -3,7 +3,7 @@ import { useAppState } from '../app/AppStateContext';
 import { childCopy } from '../copy/childCopy';
 import './screens.css';
 
-const AUTO_RETURN_MS = 3000;
+const AUTO_RETURN_MS = 4000;
 const COMPLETE_AUTO_RETURN_MS = 5000;
 const TUTORIAL_AUTO_ADVANCE_MS = 3500;
 
@@ -61,6 +61,7 @@ export function ResultScreen() {
           <p>{childCopy.result.savedToGallery}</p>
         </>
       )}
+      <p>{childCopy.result.exploreMore(selectedNumberId ?? 0)}</p>
       {isComplete && (
         <div className="complete-celebration">
           <p className="complete-celebration__title">{childCopy.result.completeTitle}</p>

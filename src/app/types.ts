@@ -1,5 +1,6 @@
 export type ScreenName =
   | 'home'
+  | 'photoSelect'
   | 'trace'
   | 'result'
   | 'gallery'

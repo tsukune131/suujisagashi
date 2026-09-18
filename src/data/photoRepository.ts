@@ -76,6 +76,11 @@ export async function getPhotosByNumber(numberId: NumberId): Promise<Photo[]> {
   return photos.filter((p) => p.numberId === numberId);
 }
 
+export async function getPhotoById(id: string): Promise<Photo | null> {
+  const photos = await readAll();
+  return photos.find((p) => p.id === id) ?? null;
+}
+
 /** ホーム画面のバッジ表示用: 登録済みの数字一覧(重複なし)。 */
 export async function getRegisteredNumberIds(): Promise<Set<NumberId>> {
   const photos = await readAll();

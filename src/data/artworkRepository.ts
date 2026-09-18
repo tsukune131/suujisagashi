@@ -2,6 +2,7 @@ import { Capacitor } from '@capacitor/core';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { Preferences } from '@capacitor/preferences';
 import type { NumberId } from '../app/types';
+import type { Stamp } from '../lib/stamps';
 import type { Stroke } from '../lib/strokes';
 import type { Artwork } from './artworkTypes';
 
@@ -28,11 +29,12 @@ interface SaveArtworkParams {
   imageBase64: string;
   thumbnailBase64: string;
   strokes: Stroke[];
+  stamps: Stamp[];
 }
 
 /**
- * 画像とストローク(TraceDrawing相当、将来の再編集用)はファイルに書き、
- * Preferences(UserDefaults)には小さなメタデータだけを置く。
+ * 画像と描画データ(TraceDrawing相当、将来の再編集用。線とスタンプの両方)は
+ * ファイルに書き、Preferences(UserDefaults)には小さなメタデータだけを置く。
  */
 export async function saveArtwork(params: SaveArtworkParams): Promise<Artwork> {
   await ensureArtworksDir();
@@ -58,8 +60,8 @@ export async function saveArtwork(params: SaveArtworkParams): Promise<Artwork> {
     directory: Directory.Data,
   });
   await Filesystem.writeFile({
-    path: `${ARTWORKS_DIR}/${id}.strokes.json`,
-    data: JSON.stringify(params.strokes),
+    path: `${ARTWORKS_DIR}/${id}.drawing.json`,
+    data: JSON.stringify({ strokes: params.strokes, stamps: params.stamps }),
     directory: Directory.Data,
     encoding: Encoding.UTF8,
   });

@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useAppState } from '../app/AppStateContext';
 import tutorialCarUrl from '../assets/tutorial-car.svg';
+import { NumberDots } from '../components/NumberDots';
 import { childCopy } from '../copy/childCopy';
 import { resolveArtworkUri, saveArtwork } from '../data/artworkRepository';
 import { getLastStrokeColor, setLastStrokeColor } from '../data/drawingPrefs';
-import { getPhotosByNumber, resolvePhotoUri } from '../data/photoRepository';
+import { getPhotoById, resolvePhotoUri } from '../data/photoRepository';
 import type { Photo } from '../data/photoTypes';
 import { recordStampIfNeeded } from '../data/progressRepository';
 import { compositeArtwork } from '../lib/compositeArtwork';
 import { tutorialGuideCircle } from '../lib/coverLayout';
 import { completionHapticFeedback } from '../lib/haptics';
 import { refreshReminders } from '../lib/reminderSync';
-import { drawStroke, totalStrokeLength, type Point, type Stroke } from '../lib/strokes';
+import { createStamp, drawStamp, STAMP_FONT_SIZE_PX, type Stamp } from '../lib/stamps';
+import { drawStroke, requiredStrokeCount, totalStrokeLength, type Point, type Stroke } from '../lib/strokes';
 import './TraceScreen.css';
 
 const COLORS = ['#ff5b5b', '#ffa94d', '#ffd43b', '#69db7c', '#4dabf7', '#b197fc', '#ff8fab'];
@@ -21,9 +23,13 @@ const STROKE_WIDTH = 16;
 const COMPLETE_LENGTH_RATIO = 1.2;
 const RESULT_TRANSITION_DELAY_MS = 400;
 
+type Tool = 'pen' | 'stamp';
+type DrawAction = { kind: 'stroke'; stroke: Stroke } | { kind: 'stamp'; stamp: Stamp };
+
 export function TraceScreen() {
   const {
     selectedNumberId,
+    selectedPhotoId,
     navigate,
     setLastArtworkUri,
     setLastStampResult,
@@ -33,6 +39,7 @@ export function TraceScreen() {
   const [photo, setPhoto] = useState<Photo | null | undefined>(undefined);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [imageReady, setImageReady] = useState(false);
+  const [tool, setTool] = useState<Tool>('pen');
   const [currentColor, setCurrentColor] = useState(DEFAULT_COLOR);
   const [canUndo, setCanUndo] = useState(false);
   const [completing, setCompleting] = useState(false);
@@ -42,7 +49,7 @@ export function TraceScreen() {
   const photoImgRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
-  const strokesRef = useRef<Stroke[]>([]);
+  const actionsRef = useRef<DrawAction[]>([]);
   const drawingRef = useRef<{ pointerId: number; points: Point[] } | null>(null);
   const completeThresholdRef = useRef(Number.POSITIVE_INFINITY);
 
@@ -53,22 +60,24 @@ export function TraceScreen() {
   }, []);
 
   useEffect(() => {
-    if (selectedNumberId == null) return;
     if (isTutorialActive) {
       setPhotoUri(tutorialCarUrl);
       return;
     }
-    getPhotosByNumber(selectedNumberId).then(async (photos) => {
-      if (photos.length === 0) {
+    if (selectedPhotoId == null) {
+      setPhoto(null);
+      return;
+    }
+    getPhotoById(selectedPhotoId).then(async (chosen) => {
+      if (!chosen) {
         setPhoto(null);
         return;
       }
-      const chosen = photos[Math.floor(Math.random() * photos.length)];
       const uri = await resolvePhotoUri(chosen.imagePath);
       setPhoto(chosen);
       setPhotoUri(uri);
     });
-  }, [selectedNumberId, isTutorialActive]);
+  }, [selectedPhotoId, isTutorialActive]);
 
   // 画像のデコードが終わるまではキャンバスを用意せず、なぞりも完成判定も受け付けない
   useEffect(() => {
@@ -104,8 +113,12 @@ export function TraceScreen() {
     if (!ctx || !canvas) return;
     const dpr = window.devicePixelRatio || 1;
     ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
-    for (const stroke of strokesRef.current) {
-      drawStroke(ctx, stroke);
+    for (const action of actionsRef.current) {
+      if (action.kind === 'stroke') {
+        drawStroke(ctx, action.stroke);
+      } else {
+        drawStamp(ctx, action.stamp, STAMP_FONT_SIZE_PX);
+      }
     }
   };
 
@@ -114,10 +127,40 @@ export function TraceScreen() {
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   };
 
+  const checkCompletion = () => {
+    const strokeActions = actionsRef.current.filter((a) => a.kind === 'stroke');
+    const stampCount = actionsRef.current.length - strokeActions.length;
+    const actionCount = actionsRef.current.length;
+    const enoughActions = actionCount >= requiredStrokeCount(selectedNumberId ?? 0);
+    // スタンプは1個でも置けば十分な意思表示とみなし、線の合計長さは問わない
+    const enoughEffort =
+      stampCount > 0 ||
+      totalStrokeLength(strokeActions.map((a) => a.stroke)) >= completeThresholdRef.current;
+    if (enoughActions && enoughEffort) {
+      setCompleting(true);
+      window.setTimeout(() => void completeAndSave(), RESULT_TRANSITION_DELAY_MS);
+    }
+  };
+
+  const placeStamp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const point = pointFromEvent(e);
+    actionsRef.current.push({
+      kind: 'stamp',
+      stamp: createStamp(point.x, point.y, currentColor, selectedNumberId ?? 0),
+    });
+    setCanUndo(true);
+    redraw();
+    checkCompletion();
+  };
+
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    // 準備前・完成処理中は描かせない。なぞり中の2本目以降の指は無視する(マルチタッチ無効化)
+    // 準備前・完成処理中は受け付けない。2本目以降の指は無視する(マルチタッチ無効化)
     if (!ctxRef.current || completing || drawingRef.current) return;
     e.currentTarget.setPointerCapture(e.pointerId);
+    if (tool === 'stamp') {
+      placeStamp(e);
+      return;
+    }
     drawingRef.current = { pointerId: e.pointerId, points: [pointFromEvent(e)] };
   };
 
@@ -135,13 +178,13 @@ export function TraceScreen() {
     if (!drawing || drawing.pointerId !== e.pointerId) return;
     drawingRef.current = null;
     if (drawing.points.length < 2) return;
-    strokesRef.current.push({ color: currentColor, width: STROKE_WIDTH, points: drawing.points });
+    actionsRef.current.push({
+      kind: 'stroke',
+      stroke: { color: currentColor, width: STROKE_WIDTH, points: drawing.points },
+    });
     setCanUndo(true);
     redraw();
-    if (totalStrokeLength(strokesRef.current) >= completeThresholdRef.current) {
-      setCompleting(true);
-      window.setTimeout(() => void completeAndSave(), RESULT_TRANSITION_DELAY_MS);
-    }
+    checkCompletion();
   };
 
   const completeAndSave = async () => {
@@ -155,15 +198,21 @@ export function TraceScreen() {
     const wrap = wrapRef.current;
     const photoImg = photoImgRef.current;
     if (wrap && photoImg && photo) {
-      const strokes = strokesRef.current.slice();
+      const strokes = actionsRef.current
+        .filter((a): a is { kind: 'stroke'; stroke: Stroke } => a.kind === 'stroke')
+        .map((a) => a.stroke);
+      const stamps = actionsRef.current
+        .filter((a): a is { kind: 'stamp'; stamp: Stamp } => a.kind === 'stamp')
+        .map((a) => a.stamp);
       try {
         const rect = wrap.getBoundingClientRect();
-        const images = compositeArtwork(photoImg, rect.width, rect.height, strokes);
+        const images = compositeArtwork(photoImg, rect.width, rect.height, strokes, stamps);
         const artwork = await saveArtwork({
           photoId: photo.id,
           numberId: photo.numberId,
           ...images,
           strokes,
+          stamps,
         });
         setLastArtworkUri(await resolveArtworkUri(artwork.thumbnailPath));
         setLastStampResult(await recordStampIfNeeded(photo.numberId));
@@ -176,13 +225,13 @@ export function TraceScreen() {
   };
 
   const handleUndo = () => {
-    strokesRef.current.pop();
-    setCanUndo(strokesRef.current.length > 0);
+    actionsRef.current.pop();
+    setCanUndo(actionsRef.current.length > 0);
     redraw();
   };
 
   const handleClearAll = () => {
-    strokesRef.current = [];
+    actionsRef.current = [];
     setCanUndo(false);
     redraw();
   };
@@ -197,12 +246,12 @@ export function TraceScreen() {
       <div className="trace-screen">
         <div className="trace-header">{childCopy.trace.promptFor(selectedNumberId ?? 0)}</div>
         <div className="trace-canvas-wrap">
-          <div className="trace-empty">{childCopy.trace.emptyPhoto}</div>
+          <div className="trace-empty">{childCopy.photoSelect.emptyPhoto}</div>
         </div>
         <div className="trace-toolbar">
           <div className="trace-buttons">
             <button type="button" className="trace-tool-button" onClick={() => navigate('home')}>
-              {childCopy.trace.backHome}
+              {childCopy.photoSelect.backHome}
             </button>
           </div>
         </div>
@@ -213,9 +262,14 @@ export function TraceScreen() {
   return (
     <div className="trace-screen">
       <div className="trace-header">
-        {isTutorialActive
-          ? childCopy.trace.tutorialPrompt
-          : childCopy.trace.promptFor(selectedNumberId ?? 0)}
+        {isTutorialActive ? (
+          childCopy.trace.tutorialPrompt
+        ) : (
+          <>
+            {childCopy.trace.promptFor(selectedNumberId ?? 0)}
+            <NumberDots count={selectedNumberId ?? 0} className="trace-header__dots" />
+          </>
+        )}
       </div>
       <div className="trace-canvas-wrap" ref={wrapRef}>
         {photoUri && (
@@ -241,6 +295,22 @@ export function TraceScreen() {
         />
       </div>
       <div className="trace-toolbar">
+        <div className="tool-toggle">
+          <button
+            type="button"
+            className={`tool-toggle-button${tool === 'pen' ? ' tool-toggle-button--active' : ''}`}
+            onClick={() => setTool('pen')}
+          >
+            ✏️ {childCopy.trace.penTool}
+          </button>
+          <button
+            type="button"
+            className={`tool-toggle-button${tool === 'stamp' ? ' tool-toggle-button--active' : ''}`}
+            onClick={() => setTool('stamp')}
+          >
+            🔢 {childCopy.trace.stampTool}
+          </button>
+        </div>
         <div className="color-palette">
           {COLORS.map((c) => (
             <button
