@@ -4,6 +4,7 @@
  */
 export const parentCopy = {
   gate: {
+    hint: '長押しで開く',
     title: '保護者の方へ',
     question: (a: number, b: number) => `${a} × ${b} の答えを入力してください`,
     wrong: '答えが違います。新しい問題でもう一度お試しください。',

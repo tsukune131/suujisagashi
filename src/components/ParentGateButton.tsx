@@ -67,17 +67,21 @@ export function ParentGateButton({ onActivate }: ParentGateButtonProps) {
 
   return (
     <>
-      <button
-        type="button"
-        className="parent-gate-button"
-        aria-label={childCopy.parentGate.ariaLabel}
-        onPointerDown={start}
-        onPointerUp={cancel}
-        onPointerLeave={cancel}
-        onPointerCancel={cancel}
-      >
-        ⚙
-      </button>
+      <div className="parent-gate-wrap">
+        <span className="parent-gate-hint">{parentCopy.gate.hint}</span>
+        <button
+          type="button"
+          className="parent-gate-button"
+          aria-label={childCopy.parentGate.ariaLabel}
+          onPointerDown={start}
+          onPointerUp={cancel}
+          onPointerLeave={cancel}
+          onPointerCancel={cancel}
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          ⚙
+        </button>
+      </div>
       {quizOpen && (
         <div className="parent-gate-overlay" role="dialog" aria-modal="true">
           <div className="parent-gate-dialog">
