@@ -8,6 +8,8 @@ const KEYPAD = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'];
 
 interface ParentGateButtonProps {
   onActivate: () => void;
+  /** ボタンに表示する文言(歯車アイコンだけだと何のボタンか伝わりにくいため)。 */
+  label: string;
 }
 
 function newQuestion(): { a: number; b: number } {
@@ -20,7 +22,7 @@ function newQuestion(): { a: number; b: number } {
  * かけ算を正解した時だけ onActivate を呼ぶ(設計書「9. 非機能要件: 安全性」、
  * App Store Review Guidelines 1.3 Kids Category)。
  */
-export function ParentGateButton({ onActivate }: ParentGateButtonProps) {
+export function ParentGateButton({ onActivate, label }: ParentGateButtonProps) {
   const timerRef = useRef<number | null>(null);
   const [quizOpen, setQuizOpen] = useState(false);
   const [question, setQuestion] = useState(newQuestion);
@@ -72,14 +74,14 @@ export function ParentGateButton({ onActivate }: ParentGateButtonProps) {
         <button
           type="button"
           className="parent-gate-button"
-          aria-label={childCopy.parentGate.ariaLabel}
+          aria-label={`${label}(${childCopy.parentGate.ariaLabel})`}
           onPointerDown={start}
           onPointerUp={cancel}
           onPointerLeave={cancel}
           onPointerCancel={cancel}
           onContextMenu={(e) => e.preventDefault()}
         >
-          ⚙
+          ⚙ {label}
         </button>
       </div>
       {quizOpen && (

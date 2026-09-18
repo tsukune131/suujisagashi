@@ -8,9 +8,20 @@
   font-display: swap;
 }
 
+/* 子供向け本文(ひらがな・カタカナ)の丸みのあるフォント(Yusei Magic,
+   SIL OFL 1.1、assets/fonts/YuseiMagic-OFL.txt 同梱)。同じく外部CDNは
+   使わずビルドに同梱する。 */
+@font-face {
+  font-family: 'YuseiMagic';
+  src: url('./assets/fonts/YuseiMagic.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   color-scheme: light;
   --numeral-font: 'Fredoka', -apple-system, BlinkMacSystemFont, sans-serif;
+  --child-text-font: 'YuseiMagic', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
 
   /* 「コインゲーム風」の質感用パレット(設計書 4-2)。各色に
      グラデーション(明/暗)・落ち影の色・文字色をセットで持つ。
@@ -68,8 +79,7 @@ body,
 }
 
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  font-family: var(--child-text-font);
   /* 単色フラットを避け、複数のパステルを緩やかに混ぜた背景にする */
   background:
     radial-gradient(circle at 15% 8%, rgba(255, 210, 240, 0.55), transparent 45%),

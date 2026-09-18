@@ -14,10 +14,10 @@ interface PhotoWithUri extends Photo {
 }
 
 /**
- * 数字を選んだ直後に挟む画面。ここで「60びょう/せいげんなし」を必ず選ぶ。
- * 写真が1枚だけならモードを選んだ瞬間になぞり画面へ進み、2枚以上ある時だけ
- * サムネイルから選ばせる(1画面1アクションを崩さないため、写真を選ぶ手間は
- * 必要な時だけ増やす)。
+ * 数字を選んだ直後に挟む画面。ここで「60びょう/せいげんなし」を選び、
+ * 写真をタップして確定する。写真が1枚だけでも必ず表示する
+ * (モード選択と同時に写真を一度も見せずに進めると、どの写真でなぞるのか
+ * 確認できないまま画面が切り替わってしまう)。
  */
 export function PhotoSelectScreen() {
   const { selectedNumberId, selectPhoto, navigate } = useAppState();
@@ -54,13 +54,6 @@ export function PhotoSelectScreen() {
     );
   }
 
-  const chooseMode = (next: TraceMode) => {
-    setMode(next);
-    if (photos.length === 1) {
-      selectPhoto(photos[0].id, next);
-    }
-  };
-
   return (
     <div className="photo-select-screen">
       <h1>{childCopy.photoSelect.title(selectedNumberId ?? 0)}</h1>
@@ -68,32 +61,33 @@ export function PhotoSelectScreen() {
         <button
           type="button"
           className={`photo-select-mode-button${mode === 'timed' ? ' photo-select-mode-button--active' : ''}`}
-          onClick={() => chooseMode('timed')}
+          onClick={() => setMode('timed')}
         >
           ⏱ {childCopy.photoSelect.modeTimed}
         </button>
         <button
           type="button"
           className={`photo-select-mode-button${mode === 'unlimited' ? ' photo-select-mode-button--active' : ''}`}
-          onClick={() => chooseMode('unlimited')}
+          onClick={() => setMode('unlimited')}
         >
           ♾ {childCopy.photoSelect.modeUnlimited}
         </button>
       </div>
-      {photos.length > 1 && (
-        <div className="photo-select-grid">
-          {photos.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              className="photo-select-item"
-              onClick={() => selectPhoto(p.id, mode)}
-            >
-              <img src={p.uri} alt="" />
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="photo-select-grid">
+        {photos.map((p) => (
+          <button
+            key={p.id}
+            type="button"
+            className="photo-select-item"
+            onClick={() => selectPhoto(p.id, mode)}
+          >
+            <img src={p.uri} alt="" />
+          </button>
+        ))}
+      </div>
+      <button type="button" className="screen-action-button" onClick={() => navigate('home')}>
+        {childCopy.photoSelect.backHome}
+      </button>
     </div>
   );
 }

@@ -2,8 +2,8 @@ export const childCopy = {
   home: {
     title: 'すうじさがし',
     gallery: 'ギャラリー',
-    roundLabel: (round: number) => `いまは ${round}まいめ`,
-    lapLabel: (round: number) => `【${round}しゅうめ】`,
+    roundLabel: (round: number) => `★を ぜんぶ あつめよう(${round}まいめ)`,
+    lapLabel: (round: number) => `★を ぜんぶ あつめよう(${round}しゅうめ)`,
   },
   photoSelect: {
     title: (numberId: number) => `${numberId}の しゃしんは どれに する?`,
@@ -38,6 +38,8 @@ export const childCopy = {
     sortOld: 'ふるい じゅん',
     empty: 'まだ さくひんが ないよ。すうじを さがしに いこう!',
     backHome: 'ホームに もどる',
+    close: 'とじる',
+    saveHint: 'がめんを ながおしすると しゃしんに ほぞんできるよ',
   },
   parentGate: {
     ariaLabel: 'せっていを ひらく',

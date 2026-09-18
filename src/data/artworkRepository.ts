@@ -77,6 +77,30 @@ export async function getAllArtworks(): Promise<Artwork[]> {
   return readArtworks();
 }
 
+/** 画像・サムネイル・描画データのファイルとメタデータを削除する(取り消し不可)。 */
+export async function deleteArtwork(id: string): Promise<void> {
+  const artworks = await readArtworks();
+  const target = artworks.find((a) => a.id === id);
+  if (!target) return;
+
+  for (const path of [
+    target.exportedImagePath,
+    target.thumbnailPath,
+    `${ARTWORKS_DIR}/${id}.drawing.json`,
+  ]) {
+    try {
+      await Filesystem.deleteFile({ path, directory: Directory.Data });
+    } catch {
+      // ファイルが既に無くても、メタデータの削除は続行する
+    }
+  }
+
+  await Preferences.set({
+    key: ARTWORKS_PREFS_KEY,
+    value: JSON.stringify(artworks.filter((a) => a.id !== id)),
+  });
+}
+
 export async function resolveArtworkUri(path: string): Promise<string> {
   const { uri } = await Filesystem.getUri({ path, directory: Directory.Data });
   return Capacitor.convertFileSrc(uri);

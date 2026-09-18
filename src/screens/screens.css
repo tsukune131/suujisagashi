@@ -30,6 +30,16 @@
   font-size: 34px;
 }
 
+/* align-items: center の flex item はデフォルトで内容の幅に縮んでしまい、
+   長い文が折り返さずはみ出して見切れる(「改行が終わってる」不具合の原因)。
+   段落は横幅いっぱいまで広げてから折り返させる */
+.screen p {
+  width: 100%;
+  max-width: 340px;
+  margin: 0;
+  line-height: 1.5;
+}
+
 .number-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -161,6 +171,8 @@
 }
 
 .round-badge {
+  width: 100%;
+  max-width: 280px;
   margin: -12px 0 0;
   font-size: 14px;
   font-weight: bold;
@@ -222,6 +234,12 @@
   background: linear-gradient(180deg, #ffffff, #f3f0ff);
   box-shadow: 0 4px 12px rgba(90, 60, 160, 0.12);
   max-width: 320px;
+}
+
+.pro-section p {
+  width: 100%;
+  margin: 0;
+  line-height: 1.5;
 }
 
 .pro-section h2 {

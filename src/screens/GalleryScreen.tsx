@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAppState } from '../app/AppStateContext';
+import { ArtworkViewer } from '../components/ArtworkViewer';
 import { childCopy } from '../copy/childCopy';
 import { getAllArtworks, resolveArtworkUri } from '../data/artworkRepository';
 import type { Artwork } from '../data/artworkTypes';
@@ -18,6 +19,7 @@ export function GalleryScreen() {
   const [artworks, setArtworks] = useState<ArtworkWithUri[]>([]);
   const [numberFilter, setNumberFilter] = useState<number | 'all'>('all');
   const [sortOrder, setSortOrder] = useState<SortOrder>('new');
+  const [viewing, setViewing] = useState<{ id: string; uri: string } | null>(null);
 
   useEffect(() => {
     getAllArtworks().then(async (list) => {
@@ -36,6 +38,16 @@ export function GalleryScreen() {
       return sortOrder === 'new' ? -diff : diff;
     });
   }, [artworks, numberFilter, sortOrder]);
+
+  const openViewer = async (a: ArtworkWithUri) => {
+    const fullUri = await resolveArtworkUri(a.exportedImagePath);
+    setViewing({ id: a.id, uri: fullUri });
+  };
+
+  const handleDeleted = (id: string) => {
+    setArtworks((prev) => prev.filter((a) => a.id !== id));
+    setViewing(null);
+  };
 
   return (
     <div className="gallery-screen">
@@ -73,16 +85,29 @@ export function GalleryScreen() {
       ) : (
         <div className="gallery-grid">
           {visible.map((a) => (
-            <div key={a.id} className="gallery-item">
+            <button
+              key={a.id}
+              type="button"
+              className="gallery-item"
+              onClick={() => openViewer(a)}
+            >
               <img src={a.uri} alt="" />
               <span className="gallery-item-badge">{a.numberId}</span>
-            </div>
+            </button>
           ))}
         </div>
       )}
       <button type="button" className="gallery-filter-button" onClick={() => navigate('home')}>
         {childCopy.gallery.backHome}
       </button>
+      {viewing && (
+        <ArtworkViewer
+          artworkId={viewing.id}
+          uri={viewing.uri}
+          onClose={() => setViewing(null)}
+          onDeleted={handleDeleted}
+        />
+      )}
     </div>
   );
 }

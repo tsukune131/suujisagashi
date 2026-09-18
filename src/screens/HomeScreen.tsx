@@ -3,6 +3,7 @@ import { useAppState } from '../app/AppStateContext';
 import { NumberDots } from '../components/NumberDots';
 import { ParentGateButton } from '../components/ParentGateButton';
 import { childCopy } from '../copy/childCopy';
+import { parentCopy } from '../copy/parentCopy';
 import { getRegisteredNumberIds } from '../data/photoRepository';
 import { ALL_NUMBER_IDS, isStamped, MAX_CARD_IMAGES } from '../data/progressLogic';
 import { getProgress } from '../data/progressRepository';
@@ -51,7 +52,7 @@ export function HomeScreen() {
       <button type="button" className="screen-action-button" onClick={() => navigate('gallery')}>
         {childCopy.home.gallery}
       </button>
-      <ParentGateButton onActivate={() => navigate('register')} />
+      <ParentGateButton onActivate={() => navigate('register')} label={parentCopy.register.title} />
     </div>
   );
 }

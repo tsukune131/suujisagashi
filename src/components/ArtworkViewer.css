@@ -1,0 +1,88 @@
+.artwork-viewer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  padding-top: calc(16px + env(safe-area-inset-top));
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.artwork-viewer-close {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  left: 16px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  font-weight: bold;
+  touch-action: manipulation;
+}
+
+.artwork-viewer-image {
+  max-width: 100%;
+  max-height: 70dvh;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  /* -webkit-touch-callout をここでは無効化しない(既定のまま)ことで、
+     長押しでiOS標準の「写真に追加」メニューを出せるようにする */
+}
+
+.artwork-viewer-hint {
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  max-width: 300px;
+  margin: 0;
+}
+
+.artwork-viewer-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 21;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.artwork-viewer-confirm-dialog {
+  width: 100%;
+  max-width: 300px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.artwork-viewer-confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.artwork-viewer-confirm-actions button {
+  min-height: 48px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  background: linear-gradient(180deg, #ffffff, #e2e2e2);
+}
+
+.artwork-viewer-confirm-delete {
+  background: linear-gradient(180deg, #ff8a80, #e53935) !important;
+  color: #fff;
+}

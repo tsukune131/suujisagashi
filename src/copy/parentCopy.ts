@@ -31,6 +31,12 @@ export const parentCopy = {
     taggingSkipped: (n: number) =>
       `無料版の上限のため、${n}枚は登録されませんでした。もっと登録するには買い切りプランが必要です。`,
   },
+  gallery: {
+    deleteLabel: 'さくひんを けす',
+    deleteConfirm: 'この作品を消します。元に戻せません。よろしいですか?',
+    deleteConfirmYes: '消す',
+    deleteConfirmNo: 'やめる',
+  },
   settings: {
     title: 'せってい',
     replayTutorial: 'あそびかたを もういちど みる',

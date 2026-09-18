@@ -169,7 +169,7 @@ export function RegisterScreen() {
       <button type="button" className="screen-action-button" onClick={() => navigate('home')}>
         {parentCopy.register.back}
       </button>
-      <ParentGateButton onActivate={() => navigate('settings')} />
+      <ParentGateButton onActivate={() => navigate('settings')} label={parentCopy.settings.title} />
     </div>
   );
 }
