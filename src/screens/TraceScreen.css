@@ -2,6 +2,8 @@
   height: 100dvh;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top);
 }
 
 .trace-header {
