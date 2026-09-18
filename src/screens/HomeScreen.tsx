@@ -52,7 +52,13 @@ export function HomeScreen() {
       <button type="button" className="screen-action-button" onClick={() => navigate('gallery')}>
         {childCopy.home.gallery}
       </button>
-      <ParentGateButton onActivate={() => navigate('register')} label={parentCopy.register.title} />
+      <ParentGateButton
+        onActivate={() => navigate('register')}
+        label={parentCopy.register.title}
+        position="center"
+        icon={false}
+      />
+      <ParentGateButton onActivate={() => navigate('settings')} label={parentCopy.settings.title} />
     </div>
   );
 }

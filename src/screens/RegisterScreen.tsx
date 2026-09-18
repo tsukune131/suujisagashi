@@ -2,7 +2,6 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { useEffect, useState } from 'react';
 import { useAppState } from '../app/AppStateContext';
 import { usePro } from '../app/ProContext';
-import { ParentGateButton } from '../components/ParentGateButton';
 import { parentCopy } from '../copy/parentCopy';
 import { getAllPhotos, registerPhoto } from '../data/photoRepository';
 import { numberColorClass } from '../lib/numberColor';
@@ -134,7 +133,7 @@ export function RegisterScreen() {
   }
 
   return (
-    <div className="screen screen--with-gate">
+    <div className="screen">
       <h1>{parentCopy.register.title}</h1>
       {!isPro && registeredCount !== null && (
         <p>
@@ -169,7 +168,6 @@ export function RegisterScreen() {
       <button type="button" className="screen-action-button" onClick={() => navigate('home')}>
         {parentCopy.register.back}
       </button>
-      <ParentGateButton onActivate={() => navigate('settings')} label={parentCopy.settings.title} />
     </div>
   );
 }

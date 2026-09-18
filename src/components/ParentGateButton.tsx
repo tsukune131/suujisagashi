@@ -10,6 +10,10 @@ interface ParentGateButtonProps {
   onActivate: () => void;
   /** ボタンに表示する文言(歯車アイコンだけだと何のボタンか伝わりにくいため)。 */
   label: string;
+  /** 画面上の固定位置。省略時は右下(設定などの補助操作向け)。 */
+  position?: 'right' | 'center';
+  /** 歯車アイコンを表示するか。写真の登録ボタンなど、主要動線では非表示にする。 */
+  icon?: boolean;
 }
 
 function newQuestion(): { a: number; b: number } {
@@ -22,7 +26,7 @@ function newQuestion(): { a: number; b: number } {
  * かけ算を正解した時だけ onActivate を呼ぶ(設計書「9. 非機能要件: 安全性」、
  * App Store Review Guidelines 1.3 Kids Category)。
  */
-export function ParentGateButton({ onActivate, label }: ParentGateButtonProps) {
+export function ParentGateButton({ onActivate, label, position = 'right', icon = true }: ParentGateButtonProps) {
   const timerRef = useRef<number | null>(null);
   const [quizOpen, setQuizOpen] = useState(false);
   const [question, setQuestion] = useState(newQuestion);
@@ -69,7 +73,7 @@ export function ParentGateButton({ onActivate, label }: ParentGateButtonProps) {
 
   return (
     <>
-      <div className="parent-gate-wrap">
+      <div className={`parent-gate-wrap parent-gate-wrap--${position}`}>
         <span className="parent-gate-hint">{parentCopy.gate.hint}</span>
         <button
           type="button"
@@ -81,7 +85,7 @@ export function ParentGateButton({ onActivate, label }: ParentGateButtonProps) {
           onPointerCancel={cancel}
           onContextMenu={(e) => e.preventDefault()}
         >
-          ⚙ {label}
+          {icon ? `⚙ ${label}` : label}
         </button>
       </div>
       {quizOpen && (

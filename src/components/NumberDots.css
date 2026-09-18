@@ -1,10 +1,9 @@
 .number-dots {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  justify-items: center;
   align-content: center;
   gap: 1px;
-  max-width: 52px;
   line-height: 1;
 }
 
