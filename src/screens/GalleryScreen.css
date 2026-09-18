@@ -26,16 +26,26 @@
   flex: none;
   min-width: 44px;
   min-height: 44px;
+  padding: 0 14px;
   border-radius: 999px;
   border: none;
   font-weight: bold;
-  background: #eee;
-  color: #555;
+  background: linear-gradient(180deg, #ffffff, #ececec);
+  color: #666;
+  box-shadow: 0 2px 0 #d8d8d8;
+  transition: transform 0.08s ease;
 }
 
+.gallery-filter-button:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+/* 数字別フィルタボタンは数字ボタンと同じ色対応にする(0〜7色を巡回)。 */
 .gallery-filter-button--active {
-  background: #ffe680;
-  color: #4a3b00;
+  background: linear-gradient(180deg, var(--hi, #fff3b0) 0%, var(--lo, #ffcf40) 100%);
+  color: var(--ink, #6b4a00);
+  box-shadow: 0 2px 0 var(--shadow, #d99a00);
 }
 
 .gallery-sort-row {
@@ -57,6 +67,7 @@
   border-radius: 12px;
   overflow: hidden;
   background: #f0f0f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
 .gallery-item img {

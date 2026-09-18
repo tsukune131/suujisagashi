@@ -1,5 +1,48 @@
 :root {
   color-scheme: light;
+
+  /* 「コインゲーム風」の質感用パレット(設計書 4-2)。各色に
+     グラデーション(明/暗)・落ち影の色・文字色をセットで持つ。
+     単色ベタ塗りを避け、光沢のあるおもちゃのボタンのような立体感を出す。 */
+  --candy-0-hi: #fff3b0;
+  --candy-0-lo: #ffcf40;
+  --candy-0-shadow: #d99a00;
+  --candy-0-ink: #6b4a00;
+
+  --candy-1-hi: #ffc2d6;
+  --candy-1-lo: #ff7fa8;
+  --candy-1-shadow: #d43d72;
+  --candy-1-ink: #7a0d33;
+
+  --candy-2-hi: #b8e6ff;
+  --candy-2-lo: #4fb6f0;
+  --candy-2-shadow: #1a7fbf;
+  --candy-2-ink: #063a5c;
+
+  --candy-3-hi: #d4f7b0;
+  --candy-3-lo: #7ed957;
+  --candy-3-shadow: #45a324;
+  --candy-3-ink: #234d0f;
+
+  --candy-4-hi: #ffd4a8;
+  --candy-4-lo: #ff9d3d;
+  --candy-4-shadow: #d9700a;
+  --candy-4-ink: #6b3400;
+
+  --candy-5-hi: #ddc8ff;
+  --candy-5-lo: #a480f5;
+  --candy-5-shadow: #6f45c9;
+  --candy-5-ink: #3a1d6b;
+
+  --candy-6-hi: #b0f2ee;
+  --candy-6-lo: #43cfc8;
+  --candy-6-shadow: #1f9992;
+  --candy-6-ink: #0a4542;
+
+  --candy-7-hi: #ffbcae;
+  --candy-7-lo: #ff7a63;
+  --candy-7-shadow: #d9432a;
+  --candy-7-ink: #6b1a0a;
 }
 
 * {
@@ -16,7 +59,12 @@ body,
 body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
-  background: linear-gradient(180deg, #ffffff 0%, #eaf6ff 100%);
+  /* 単色フラットを避け、複数のパステルを緩やかに混ぜた背景にする */
+  background:
+    radial-gradient(circle at 15% 8%, rgba(255, 210, 240, 0.55), transparent 45%),
+    radial-gradient(circle at 85% 88%, rgba(180, 230, 255, 0.6), transparent 50%),
+    linear-gradient(160deg, #fff9e8 0%, #eaf6ff 55%, #eafbf0 100%);
+  background-attachment: fixed;
   /* ダブルタップ拡大を無効化。なぞり中のマルチタッチ無視は TraceScreen 側で行う */
   touch-action: manipulation;
   -webkit-user-select: none;

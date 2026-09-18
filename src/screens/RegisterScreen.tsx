@@ -5,6 +5,7 @@ import { usePro } from '../app/ProContext';
 import { ParentGateButton } from '../components/ParentGateButton';
 import { parentCopy } from '../copy/parentCopy';
 import { getAllPhotos, registerPhoto } from '../data/photoRepository';
+import { numberColorClass } from '../lib/numberColor';
 import { refreshReminders } from '../lib/reminderSync';
 import { FREE_PHOTO_LIMIT } from '../lib/proConfig';
 import './screens.css';
@@ -91,7 +92,7 @@ export function RegisterScreen() {
             <button
               key={n}
               type="button"
-              className="number-button"
+              className={`number-button ${numberColorClass('number-button', n)}`}
               onClick={() => tagWithNumber(n)}
             >
               {n}
@@ -133,7 +134,7 @@ export function RegisterScreen() {
   }
 
   return (
-    <div className="screen">
+    <div className="screen screen--with-gate">
       <h1>{parentCopy.register.title}</h1>
       {!isPro && registeredCount !== null && (
         <p>

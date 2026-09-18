@@ -3,6 +3,7 @@ import { useAppState } from '../app/AppStateContext';
 import { childCopy } from '../copy/childCopy';
 import { getAllArtworks, resolveArtworkUri } from '../data/artworkRepository';
 import type { Artwork } from '../data/artworkTypes';
+import { numberColorClass } from '../lib/numberColor';
 import './GalleryScreen.css';
 
 const NUMBER_FILTERS = Array.from({ length: 11 }, (_, i) => i); // 0〜10
@@ -51,7 +52,7 @@ export function GalleryScreen() {
           <button
             key={n}
             type="button"
-            className={`gallery-filter-button${numberFilter === n ? ' gallery-filter-button--active' : ''}`}
+            className={`gallery-filter-button${numberFilter === n ? ` gallery-filter-button--active ${numberColorClass('gallery-filter-button', n)}` : ''}`}
             onClick={() => setNumberFilter(n)}
           >
             {n}

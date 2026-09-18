@@ -11,48 +11,140 @@
   text-align: center;
 }
 
+/* ParentGateButton(右下固定)と最後のボタンが重ならないよう余白を足す */
+.screen--with-gate {
+  padding-bottom: calc(24px + 56px + env(safe-area-inset-bottom));
+}
+
 .screen h1 {
   font-size: 28px;
   margin: 0;
+  color: #4a3b00;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.7);
 }
 
 .number-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
   width: 100%;
-  max-width: 480px;
+  max-width: 420px;
 }
 
 .number-button {
   position: relative;
-  min-width: 88px;
-  min-height: 88px;
+  width: 100%;
+  aspect-ratio: 1;
+  min-height: 64px;
   border-radius: 20px;
   border: none;
-  font-size: 32px;
+  font-size: clamp(24px, 8vw, 32px);
   font-weight: bold;
-  background: #ffe680;
-  color: #4a3b00;
   touch-action: manipulation;
+  transition: transform 0.08s ease;
+}
+
+/* 0〜10の各ボタンに色相のバリエーションを持たせ、光沢のあるおもちゃ風の
+   立体感を出す(単色ベタ塗り・平坦さの解消)。数字ボタンだけでなくギャラリー
+   フィルタでも同じ番号→色の対応を使う。 */
+.number-button--c0,
+.gallery-filter-button--c0 {
+  --hi: var(--candy-0-hi);
+  --lo: var(--candy-0-lo);
+  --shadow: var(--candy-0-shadow);
+  --ink: var(--candy-0-ink);
+}
+.number-button--c1,
+.gallery-filter-button--c1 {
+  --hi: var(--candy-1-hi);
+  --lo: var(--candy-1-lo);
+  --shadow: var(--candy-1-shadow);
+  --ink: var(--candy-1-ink);
+}
+.number-button--c2,
+.gallery-filter-button--c2 {
+  --hi: var(--candy-2-hi);
+  --lo: var(--candy-2-lo);
+  --shadow: var(--candy-2-shadow);
+  --ink: var(--candy-2-ink);
+}
+.number-button--c3,
+.gallery-filter-button--c3 {
+  --hi: var(--candy-3-hi);
+  --lo: var(--candy-3-lo);
+  --shadow: var(--candy-3-shadow);
+  --ink: var(--candy-3-ink);
+}
+.number-button--c4,
+.gallery-filter-button--c4 {
+  --hi: var(--candy-4-hi);
+  --lo: var(--candy-4-lo);
+  --shadow: var(--candy-4-shadow);
+  --ink: var(--candy-4-ink);
+}
+.number-button--c5,
+.gallery-filter-button--c5 {
+  --hi: var(--candy-5-hi);
+  --lo: var(--candy-5-lo);
+  --shadow: var(--candy-5-shadow);
+  --ink: var(--candy-5-ink);
+}
+.number-button--c6,
+.gallery-filter-button--c6 {
+  --hi: var(--candy-6-hi);
+  --lo: var(--candy-6-lo);
+  --shadow: var(--candy-6-shadow);
+  --ink: var(--candy-6-ink);
+}
+.number-button--c7,
+.gallery-filter-button--c7 {
+  --hi: var(--candy-7-hi);
+  --lo: var(--candy-7-lo);
+  --shadow: var(--candy-7-shadow);
+  --ink: var(--candy-7-ink);
+}
+
+.number-button {
+  background: linear-gradient(180deg, var(--hi) 0%, var(--lo) 100%);
+  color: var(--ink);
+  box-shadow:
+    0 4px 0 var(--shadow),
+    0 6px 10px rgba(0, 0, 0, 0.15),
+    inset 0 2px 3px rgba(255, 255, 255, 0.6);
+}
+
+.number-button:active {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 var(--shadow),
+    0 2px 4px rgba(0, 0, 0, 0.15),
+    inset 0 2px 3px rgba(255, 255, 255, 0.6);
 }
 
 .number-button--registered {
-  box-shadow: 0 0 0 3px #ffb84d inset;
+  box-shadow:
+    0 4px 0 var(--shadow),
+    0 6px 10px rgba(0, 0, 0, 0.15),
+    inset 0 2px 3px rgba(255, 255, 255, 0.6),
+    0 0 0 3px #fff inset;
 }
 
 .number-button--stamped {
-  background: #ffd23f;
-  box-shadow: 0 0 0 4px #ff9f1c inset;
+  box-shadow:
+    0 4px 0 var(--shadow),
+    0 6px 14px rgba(0, 0, 0, 0.2),
+    inset 0 2px 3px rgba(255, 255, 255, 0.8),
+    0 0 0 3px #fff9e0 inset;
 }
 
 .number-button--stamped::after {
   content: '★';
   position: absolute;
-  top: -6px;
+  top: -8px;
   right: -6px;
-  font-size: 18px;
+  font-size: 20px;
   color: #ff9f1c;
+  text-shadow: 0 1px 0 #fff;
 }
 
 .round-badge {
@@ -65,13 +157,15 @@
 .complete-celebration {
   padding: 16px 24px;
   border-radius: 20px;
-  background: linear-gradient(135deg, #ffe680, #ffb84d);
+  background: linear-gradient(135deg, var(--candy-0-hi), var(--candy-4-lo));
+  box-shadow: 0 6px 16px rgba(217, 112, 10, 0.35);
 }
 
 .complete-celebration__title {
   font-size: 22px;
   font-weight: bold;
   margin: 0 0 4px;
+  color: #6b3400;
 }
 
 .screen-action-button {
@@ -82,13 +176,27 @@
   border: none;
   font-size: 20px;
   font-weight: bold;
-  background: #a0e6c8;
-  color: #06402b;
+  background: linear-gradient(180deg, var(--candy-3-hi) 0%, var(--candy-3-lo) 100%);
+  color: var(--candy-3-ink);
+  box-shadow:
+    0 4px 0 var(--candy-3-shadow),
+    0 6px 10px rgba(0, 0, 0, 0.15),
+    inset 0 2px 3px rgba(255, 255, 255, 0.6);
   touch-action: manipulation;
+  transition: transform 0.08s ease;
+}
+
+.screen-action-button:active {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 var(--candy-3-shadow),
+    0 2px 4px rgba(0, 0, 0, 0.15),
+    inset 0 2px 3px rgba(255, 255, 255, 0.6);
 }
 
 .screen-action-button:disabled {
   opacity: 0.5;
+  transform: none;
 }
 
 .pro-section {
@@ -98,11 +206,13 @@
   gap: 12px;
   padding: 16px 20px;
   border-radius: 16px;
-  background: #f5f5f5;
+  background: linear-gradient(180deg, #ffffff, #f3f0ff);
+  box-shadow: 0 4px 12px rgba(90, 60, 160, 0.12);
   max-width: 320px;
 }
 
 .pro-section h2 {
   margin: 0;
   font-size: 18px;
+  color: #3a1d6b;
 }

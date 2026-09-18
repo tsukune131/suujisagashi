@@ -18,7 +18,8 @@
   margin: 0 12px;
   border-radius: 16px;
   overflow: hidden;
-  background: #f0f0f0;
+  background: linear-gradient(160deg, #f5f5f5, #e4e4e4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 
 .trace-photo {
@@ -88,12 +89,18 @@
   width: 40px;
   height: 40px;
   border-radius: 999px;
-  border: 3px solid transparent;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.2),
+    inset 0 3px 4px rgba(255, 255, 255, 0.5),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.15);
   touch-action: manipulation;
+  transition: transform 0.08s ease;
 }
 
 .color-swatch--selected {
   border-color: #333;
+  transform: scale(1.15);
 }
 
 .trace-buttons {
@@ -109,11 +116,19 @@
   border: none;
   font-size: 16px;
   font-weight: bold;
-  background: #e0e0e0;
-  color: #333;
+  background: linear-gradient(180deg, #ffffff, #dcdcdc);
+  color: #444;
+  box-shadow: 0 3px 0 #b8b8b8;
   touch-action: manipulation;
+  transition: transform 0.08s ease;
+}
+
+.trace-tool-button:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: none;
 }
 
 .trace-tool-button:disabled {
   opacity: 0.4;
+  box-shadow: none;
 }

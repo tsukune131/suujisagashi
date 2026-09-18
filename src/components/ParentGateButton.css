@@ -6,8 +6,9 @@
   height: 40px;
   border-radius: 999px;
   border: none;
-  background: rgba(0, 0, 0, 0.12);
-  color: rgba(0, 0, 0, 0.45);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0.12));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  color: rgba(0, 0, 0, 0.5);
   font-size: 18px;
   display: flex;
   align-items: center;
@@ -33,7 +34,8 @@
   max-width: 320px;
   padding: 20px;
   border-radius: 16px;
-  background: #fff;
+  background: linear-gradient(180deg, #ffffff, #f4f4f8);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
   text-align: center;
 }
 
@@ -76,7 +78,15 @@
   border-radius: 10px;
   border: none;
   font-size: 18px;
-  background: #e8e8e8;
+  background: linear-gradient(180deg, #ffffff, #e2e2e2);
+  box-shadow: 0 2px 0 #c4c4c4;
+  transition: transform 0.08s ease;
+}
+
+.parent-gate-keypad button:active,
+.parent-gate-actions button:active {
+  transform: translateY(2px);
+  box-shadow: none;
 }
 
 .parent-gate-actions {
@@ -86,7 +96,8 @@
 }
 
 .parent-gate-actions button:last-child {
-  background: #4dabf7;
+  background: linear-gradient(180deg, #6dc1ff, #2f8fd6);
   color: #fff;
   font-weight: bold;
+  box-shadow: 0 2px 0 #1c6fae;
 }
