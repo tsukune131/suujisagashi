@@ -31,22 +31,34 @@ jobs:
       - run: npx tsc --noEmit
       - run: npm test
 
+      # フェーズB-3(紹介ページ+法務ページ)着手前は web/index.html が無いため、
+      # 型チェック・テストだけ実行してサイト組み立て/デプロイはスキップする。
+      - name: Check site source exists
+        id: site
+        run: echo "exists=$([ -f web/index.html ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
       # 法務ページはアプリに同梱しているものと同じ実体を配る(二重管理を避ける)
       - name: Assemble site
+        if: steps.site.outputs.exists == 'true'
         run: |
           mkdir -p site
           cp web/index.html site/
           cp -r public/legal site/legal
 
       - uses: actions/configure-pages@v5
+        if: steps.site.outputs.exists == 'true'
         with:
           enablement: true
       - uses: actions/upload-pages-artifact@v3
+        if: steps.site.outputs.exists == 'true'
         with:
           path: site
+    outputs:
+      site_exists: ${{ steps.site.outputs.exists }}
 
   deploy:
     needs: build
+    if: needs.build.outputs.site_exists == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
