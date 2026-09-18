@@ -9,7 +9,9 @@ Windows + GitHub Actions のみで開発・配布する(Macは使わない)。
 
 - Bundle ID: `com.tsukune.suujisagashi`(**変更禁止**。変えるとTestFlight配布が切れる)
 - GitHubリポジトリ: `tsukune131/suujisagashi`
-- 証明書リポジトリ: `tsukune131/suujisagashi-certificates`(Private)
+- 証明書リポジトリ: `tsukune131/VitaNote-certificates`(Private、**weightアプリと共有**。
+  証明書はApple Developerチーム単位でアプリ単位ではないため。
+  GitHub Secretsもweightのものをそのまま使い回せる。詳細は docs/ios-release-setup.md 4番)
 
 ## 方針
 

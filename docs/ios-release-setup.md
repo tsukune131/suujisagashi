@@ -6,6 +6,9 @@ Mac を持たずに GitHub Actions (macOS ランナー) だけで TestFlight ま
 - Bundle ID: `com.tsukune.suujisagashi`
 - ワークフロー: [.github/workflows/ios-testflight.yml](../.github/workflows/ios-testflight.yml)(手動実行)
 - fastlane: [fastlane/Fastfile](../fastlane/Fastfile)
+- 証明書リポジトリ: `tsukune131/VitaNote-certificates`(**weightアプリと共有**。
+  証明書はアプリ単位ではなくApple Developerチーム単位なので、1つのリポジトリを
+  複数アプリで使い回すのがfastlaneの標準的な運用。詳細は下記4番)
 
 > 秘密(Key ID等)をこのファイルに書き込む運用にするなら、公開リポジトリには
 > 入れないこと(.gitignore の docs/ を有効化)。
@@ -40,17 +43,23 @@ Mac を持たずに GitHub Actions (macOS ランナー) だけで TestFlight ま
 4. `.p8` をダウンロード(**再ダウンロード不可**。無くしたら作り直し)
 5. **Key ID** と **Issuer ID** を控える
 
-## 4. match 用のプライベートリポジトリを作る
+## 4. match 用のリポジトリ: weightの `VitaNote-certificates` を共有する
 
-証明書と秘密鍵を暗号化して置く場所。**必ず Private**。
+証明書(Apple Distribution証明書)はアプリ単位ではなく**Appleデベロッパチーム単位**。
+weightアプリで作成済みの証明書リポジトリをそのまま使い回せば、新しいリポジトリも
+新しいPAT(Personal Access Token)も不要。
 
-1. GitHub で `suujisagashi-certificates` を **Private** で作成(空でよい)
-2. Fine-grained PAT を作る(Repository access: `suujisagashi-certificates` のみ /
-   Permissions: **Contents: Read and write**)
-3. 暗号化パスフレーズを**自分で決める**(どこかの画面で設定する項目ではない。
-   `MATCH_PASSWORD` として登録し、初回の certificates 実行時にこの値で暗号化される)
-   - ランダム生成: `[Convert]::ToBase64String((1..24 | ForEach-Object { Get-Random -Max 256 }))`
-   - **忘れると証明書を復号できない**。パスワードマネージャに保存
+1. weightプロジェクトで使っている以下の値をそのまま流用する(新規発行不要):
+   - `MATCH_GIT_URL`(`https://github.com/tsukune131/VitaNote-certificates.git`)
+   - `MATCH_PASSWORD`(weightの暗号化パスフレーズ)
+   - `MATCH_GIT_BASIC_AUTHORIZATION`(weightで使ったPATのbase64値)
+2. **プロビジョニングプロファイルはBundle ID固有なので、`suujisagashi`用は新規作成される**
+   (`lane certificates`実行時にmatchが自動で追加、証明書自体は既存のものを再利用する)
+3. weightで使ったPATが `VitaNote-certificates` 1リポジトリのみにスコープされた
+   Fine-grained PATなら、このままで問題ない(スコープの追加設定は不要)
+
+> 新しいアプリごとに証明書リポジトリを作る運用(weight開発時の初期対応)は
+> 必須ではなかった、という教訓。次のアプリでも同様に共有してよい。
 
 ## 5. GitHub Secrets を登録する
 
@@ -58,15 +67,18 @@ Mac を持たずに GitHub Actions (macOS ランナー) だけで TestFlight ま
 
 | Secret 名 | 値 |
 |---|---|
-| `ASC_KEY_ID` | 手順3の Key ID |
-| `ASC_ISSUER_ID` | 手順3の Issuer ID |
-| `ASC_KEY_P8_BASE64` | `.p8` を base64 にした文字列(下記) |
-| `APPLE_TEAM_ID` | 手順1の Team ID(10桁) |
-| `MATCH_GIT_URL` | `https://github.com/tsukune131/suujisagashi-certificates.git` |
-| `MATCH_PASSWORD` | 手順4のパスフレーズ |
-| `MATCH_GIT_BASIC_AUTHORIZATION` | `tsukune131:<PAT>` を base64 にした文字列 |
+| `ASC_KEY_ID` | 手順3の Key ID(**weightと同じ値を使い回せる**。APIキーはチーム単位) |
+| `ASC_ISSUER_ID` | 手順3の Issuer ID(同上) |
+| `ASC_KEY_P8_BASE64` | `.p8` を base64 にした文字列(同上、下記コマンド参照) |
+| `APPLE_TEAM_ID` | 手順1の Team ID(10桁、weightと同じApple Developerアカウントなら同一) |
+| `MATCH_GIT_URL` | `https://github.com/tsukune131/VitaNote-certificates.git` |
+| `MATCH_PASSWORD` | weightの暗号化パスフレーズ(**同じ値**。新しく決めない) |
+| `MATCH_GIT_BASIC_AUTHORIZATION` | weightで使ったPATのbase64値(**同じ値**) |
 
-PowerShell での base64 化:
+**つまり7つ全て、weightのGitHub Secretsからそのままコピーしてよい。**
+新規発行が必要なものは無い。
+
+PowerShell での base64 化(まだ手元に値がない場合のみ):
 
 ```powershell
 # .p8 ファイル
@@ -84,7 +96,8 @@ PowerShell での base64 化:
 
 1. Actions → **iOS TestFlight** → **Run workflow**
 2. lane を **`certificates`** に変更(既定は beta なので必ず変える)して実行
-3. 成功すると `suujisagashi-certificates` に `certs/` と `profiles/` ができる
+3. 成功すると `VitaNote-certificates` に `suujisagashi`(`com.tsukune.suujisagashi`)用の
+   プロビジョニングプロファイルが追加される(証明書自体はweightと共有)
 
 失敗したら `Run fastlane` のログを見る:
 
@@ -126,7 +139,9 @@ App Store Connect → TestFlight → **内部テスト**グループを作り、
 - **輸出コンプライアンス**: Info.plist に `ITSAppUsesNonExemptEncryption = false` を
   入れておくと、アップロードのたびに聞かれない。暗号化コードなし・通信なしの
   構成でのみ正しい申告。**外部通信(HTTPS)を足したら申告し直し**
-- **証明書の作り直し**: `suujisagashi-certificates` の中身を消してから lane=certificates を再実行
+- **証明書の作り直し**: `VitaNote-certificates` の中身を消すとweightアプリの証明書も
+  巻き込むので注意。すうじさがし固有のプロファイルだけ作り直したい場合は
+  lane=refresh_profiles を使う(手順7.5)
 - **Xcode バージョン**: `latest-stable` 指定なら Apple の要件更新に自動追従
 - **テスターが Apple ID の国・通貨を変えると TestFlight から外れる**。
   招待を再送すれば復旧。アプリは削除させない(ローカルデータが消える)
