@@ -95,7 +95,7 @@ export function RegisterScreen() {
               className={`number-button ${numberColorClass('number-button', n)}`}
               onClick={() => tagWithNumber(n)}
             >
-              {n}
+              <span className="numeral">{n}</span>
             </button>
           ))}
         </div>

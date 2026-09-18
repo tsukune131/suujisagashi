@@ -1,5 +1,16 @@
+/* 数字専用の丸みのある楽しいフォント(Fredoka, SIL OFL 1.1、
+   assets/fonts/Fredoka-OFL.txt 同梱)。外部CDNは使わず、ビルドに同梱して
+   完全ローカル・外部通信なしの方針を保つ。 */
+@font-face {
+  font-family: 'Fredoka';
+  src: url('./assets/fonts/Fredoka.ttf') format('truetype-variations');
+  font-weight: 600;
+  font-display: swap;
+}
+
 :root {
   color-scheme: light;
+  --numeral-font: 'Fredoka', -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* 「コインゲーム風」の質感用パレット(設計書 4-2)。各色に
      グラデーション(明/暗)・落ち影の色・文字色をセットで持つ。
@@ -75,4 +86,11 @@ body {
 button {
   font-family: inherit;
   cursor: pointer;
+}
+
+/* 数字を表示する場所で共通に使う(丸くて楽しい専用フォント)。 */
+.numeral {
+  font-family: var(--numeral-font);
+  font-variation-settings: 'wght' 600;
+  font-weight: 600;
 }

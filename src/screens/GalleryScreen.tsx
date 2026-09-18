@@ -55,7 +55,7 @@ export function GalleryScreen() {
             className={`gallery-filter-button${numberFilter === n ? ` gallery-filter-button--active ${numberColorClass('gallery-filter-button', n)}` : ''}`}
             onClick={() => setNumberFilter(n)}
           >
-            {n}
+            <span className="numeral">{n}</span>
           </button>
         ))}
       </div>

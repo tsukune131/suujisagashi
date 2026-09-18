@@ -15,11 +15,24 @@ export function createStamp(x: number, y: number, color: string, numberId: numbe
   return { x, y, color, numberId, rotation };
 }
 
+/** ボタン等と同じ丸くて楽しいフォント(src/index.cssで@font-face定義済み)。 */
+const STAMP_FONT_FAMILY = 'Fredoka';
+
+/** ページ読み込み後の初回スタンプ描画で、フォントが未読込のまま
+ * デフォルト書体で描かれてしまわないよう先に読み込んでおく。 */
+export async function preloadStampFont(): Promise<void> {
+  try {
+    await document.fonts.load(`600 ${STAMP_FONT_SIZE_PX}px ${STAMP_FONT_FAMILY}`);
+  } catch {
+    // 読み込めなくてもフォールバックフォントで描画を続ける
+  }
+}
+
 export function drawStamp(ctx: CanvasRenderingContext2D, stamp: Stamp, fontSizePx: number): void {
   ctx.save();
   ctx.translate(stamp.x, stamp.y);
   ctx.rotate((stamp.rotation * Math.PI) / 180);
-  ctx.font = `bold ${fontSizePx}px sans-serif`;
+  ctx.font = `600 ${fontSizePx}px ${STAMP_FONT_FAMILY}, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.lineWidth = fontSizePx * 0.16;

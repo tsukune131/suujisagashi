@@ -345,3 +345,23 @@ GitHub Actionsでcertificates→betaレーンを実行、TestFlight配信まで�
 - `src/lib/strokes.ts`から`requiredStrokeCount`/`totalStrokeLength`と
   そのテストを削除(呼び出し元が無くなったため)
 - `npm run build`/`npm test`(10件)/`npm run check:copy`成功
+
+## 数字表示の見た目を刷新(2026-09-18 続き)
+
+「数字のための〇は星の方がいい、フォントも魅力的じゃないし小さい」という
+指摘を受けて対応。
+
+- **専用フォント「Fredoka」を同梱**: Google FontsのFredoka(丸くて楽しい書体、
+  SIL Open Font License 1.1)をビルド時に取得し`src/assets/fonts/`に同梱
+  (`Fredoka-OFL.txt`にライセンス全文も同梱)。**外部CDNは使わず、実行時の
+  外部通信なしの方針を維持**。`.numeral`クラスとして`index.css`に定義
+- 数字表示サイズを拡大: ホーム/登録画面の数字ボタン(24→30px)、なぞり画面
+  見出し(30px)、完了画面の見出し(34px)
+- 「3を さがそう!」のような文言は、数字部分だけこのフォント・サイズを
+  当てられるよう、childCopyの`promptFor`/`found`を数字と接尾語
+  (`promptSuffix`/`foundSuffix`)に分割し、`NumeralText`コンポーネントで
+  数字部分のみ`.numeral`にする
+- 数字とセットで見せていた量表示(`NumberDots`)を、単色の丸から★マークに変更
+- キャンバス上のスタンプ(数字そのものを配置する機能)にも同じフォントを適用し、
+  描画前に`document.fonts.load()`で事前読み込みするようにした
+- `npm run build`/`npm test`(10件)/`npm run check:copy`成功

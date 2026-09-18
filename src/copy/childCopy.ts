@@ -13,7 +13,7 @@ export const childCopy = {
     modeUnlimited: 'せいげんなし',
   },
   trace: {
-    promptFor: (numberId: number) => `${numberId}を さがそう!`,
+    promptSuffix: 'を さがそう!',
     tutorialPrompt: 'ゆびで なぞってみよう!',
     undo: 'やりなおす',
     clearAll: 'ぜんぶ けす',
@@ -23,7 +23,7 @@ export const childCopy = {
     completeButton: 'かんせい!',
   },
   result: {
-    found: (numberId: number) => `${numberId}を みつけられたね!`,
+    foundSuffix: 'を みつけられたね!',
     savedToGallery: 'ギャラリーに ほぞんしたよ',
     exploreMore: (numberId: number) =>
       `おうちの なかにも ${numberId}みたいな かたちが あるか さがしてみてね`,

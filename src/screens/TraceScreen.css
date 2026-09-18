@@ -21,6 +21,10 @@
   max-width: 60px;
 }
 
+.trace-header .numeral {
+  font-size: 30px;
+}
+
 .trace-canvas-wrap {
   position: relative;
   flex: 1;

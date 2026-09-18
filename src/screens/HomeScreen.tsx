@@ -42,7 +42,7 @@ export function HomeScreen() {
             .join(' ');
           return (
             <button key={n} type="button" className={className} onClick={() => selectNumber(n)}>
-              {n}
+              <span className="numeral">{n}</span>
               <NumberDots count={n} />
             </button>
           );

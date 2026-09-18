@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useAppState } from '../app/AppStateContext';
+import { NumeralText } from '../components/NumeralText';
 import { childCopy } from '../copy/childCopy';
 import './screens.css';
 
@@ -42,7 +43,7 @@ export function ResultScreen() {
   if (justCompletedTutorial) {
     return (
       <div className="screen">
-        <h1>{childCopy.result.found(selectedNumberId ?? 0)}</h1>
+        <h1><NumeralText value={selectedNumberId ?? 0} suffix={childCopy.result.foundSuffix} /></h1>
         <p>{childCopy.result.tutorialNext}</p>
       </div>
     );
@@ -50,7 +51,7 @@ export function ResultScreen() {
 
   return (
     <div className="screen">
-      <h1>{childCopy.result.found(selectedNumberId ?? 0)}</h1>
+      <h1><NumeralText value={selectedNumberId ?? 0} suffix={childCopy.result.foundSuffix} /></h1>
       {lastArtworkUri && (
         <>
           <img

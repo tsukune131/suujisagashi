@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useAppState } from '../app/AppStateContext';
 import tutorialCarUrl from '../assets/tutorial-car.svg';
 import { NumberDots } from '../components/NumberDots';
+import { NumeralText } from '../components/NumeralText';
 import { TimerRing } from '../components/TimerRing';
 import { childCopy } from '../copy/childCopy';
 import { resolveArtworkUri, saveArtwork } from '../data/artworkRepository';
@@ -13,7 +14,7 @@ import { compositeArtwork } from '../lib/compositeArtwork';
 import { tutorialGuideCircle } from '../lib/coverLayout';
 import { completionHapticFeedback } from '../lib/haptics';
 import { refreshReminders } from '../lib/reminderSync';
-import { createStamp, drawStamp, STAMP_FONT_SIZE_PX, type Stamp } from '../lib/stamps';
+import { createStamp, drawStamp, preloadStampFont, STAMP_FONT_SIZE_PX, type Stamp } from '../lib/stamps';
 import { drawStroke, type Point, type Stroke } from '../lib/strokes';
 import './TraceScreen.css';
 
@@ -60,6 +61,7 @@ export function TraceScreen() {
     getLastStrokeColor().then((c) => {
       if (c) setCurrentColor(c);
     });
+    void preloadStampFont();
   }, []);
 
   useEffect(() => {
@@ -252,7 +254,9 @@ export function TraceScreen() {
   if (!isTutorialActive && photo === null) {
     return (
       <div className="trace-screen">
-        <div className="trace-header">{childCopy.trace.promptFor(selectedNumberId ?? 0)}</div>
+        <div className="trace-header">
+          <NumeralText value={selectedNumberId ?? 0} suffix={childCopy.trace.promptSuffix} />
+        </div>
         <div className="trace-canvas-wrap">
           <div className="trace-empty">{childCopy.photoSelect.emptyPhoto}</div>
         </div>
@@ -274,7 +278,7 @@ export function TraceScreen() {
           childCopy.trace.tutorialPrompt
         ) : (
           <>
-            {childCopy.trace.promptFor(selectedNumberId ?? 0)}
+            <NumeralText value={selectedNumberId ?? 0} suffix={childCopy.trace.promptSuffix} />
             <NumberDots count={selectedNumberId ?? 0} className="trace-header__dots" />
           </>
         )}
